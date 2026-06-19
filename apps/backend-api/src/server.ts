@@ -1,0 +1,55 @@
+import { app } from './app';
+import { env } from './config/env';
+import { logger } from './config/logger';
+import { prisma } from './config/database';
+import { redis } from './config/redis';
+
+// ============================================================
+// Server Entry Point — With Graceful Shutdown
+// ============================================================
+
+const server = app.listen(env.PORT, () => {
+  logger.info(`🚀 Server running on http://localhost:${env.PORT}`);
+  logger.info(`📖 Environment: ${env.NODE_ENV}`);
+  logger.info(`🏥 Health check: http://localhost:${env.PORT}/health`);
+});
+
+// --- Graceful Shutdown ---
+async function gracefulShutdown(signal: string) {
+  logger.info(`\n${signal} received. Starting graceful shutdown...`);
+
+  // Stop accepting new connections
+  server.close(async () => {
+    logger.info('HTTP server closed');
+
+    // Close database connection
+    await prisma.$disconnect();
+    logger.info('Database disconnected');
+
+    // Close Redis connection
+    redis.disconnect();
+    logger.info('Redis disconnected');
+
+    logger.info('✅ Graceful shutdown complete');
+    process.exit(0);
+  });
+
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    logger.error('⚠️ Could not close connections in time, forcefully shutting down');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle unhandled rejections
+process.on('unhandledRejection', (reason) => {
+  logger.error({ reason }, 'Unhandled Rejection');
+});
+
+process.on('uncaughtException', (error) => {
+  logger.fatal({ error }, 'Uncaught Exception');
+  process.exit(1);
+});
