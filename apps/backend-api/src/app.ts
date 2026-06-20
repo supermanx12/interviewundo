@@ -7,6 +7,7 @@ import { logger } from './config/logger';
 import { router } from './presentation/routes';
 import { errorHandler } from './presentation/middleware/error-handler';
 import { requestId } from './presentation/middleware/request-id';
+import { rateLimiter } from './presentation/middleware/rate-limiter';
 
 // ============================================================
 // Express App Bootstrap
@@ -17,6 +18,7 @@ const app = express();
 // --- Global Middleware ---
 app.use(requestId);
 app.use(helmet());
+app.use(rateLimiter);
 app.use(
   cors({
     origin: env.CORS_ORIGINS.split(','),

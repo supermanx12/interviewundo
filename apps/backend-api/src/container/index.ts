@@ -14,10 +14,13 @@ import { RedisCacheService } from '../infrastructure/cache/RedisCacheService';
 // --- Use Cases ---
 import { RegisterUser } from '../application/use-cases/auth/RegisterUser';
 import { LoginUser } from '../application/use-cases/auth/LoginUser';
+import { RefreshToken } from '../application/use-cases/auth/RefreshToken';
 import { GetProblems } from '../application/use-cases/problem/GetProblems';
+import { GetProblemBySlug } from '../application/use-cases/problem/GetProblemBySlug';
 
 // --- Controllers ---
 import { AuthController } from '../presentation/controllers/AuthController';
+import { ProblemController } from '../presentation/controllers/ProblemController';
 
 // ============================================================
 // Wire Dependencies
@@ -33,10 +36,13 @@ const cacheService = new RedisCacheService();
 // Step 2: Instantiate use cases with injected dependencies
 const registerUser = new RegisterUser(userRepository, passwordService, authTokenService);
 const loginUser = new LoginUser(userRepository, passwordService, authTokenService);
+const refreshToken = new RefreshToken(userRepository, authTokenService);
 const getProblems = new GetProblems(problemRepository, cacheService);
+const getProblemBySlug = new GetProblemBySlug(problemRepository, cacheService);
 
 // Step 3: Instantiate controllers
-const authController = new AuthController(registerUser, loginUser);
+const authController = new AuthController(registerUser, loginUser, refreshToken);
+const problemController = new ProblemController(getProblems, getProblemBySlug);
 
 // Step 4: Export container
 export const container = {
@@ -52,9 +58,12 @@ export const container = {
   useCases: {
     registerUser,
     loginUser,
+    refreshToken,
     getProblems,
+    getProblemBySlug,
   },
   controllers: {
     authController,
+    problemController,
   },
 };

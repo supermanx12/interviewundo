@@ -8,11 +8,11 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 | Phase | Completed Tasks | Total Tasks | Completion % | Status |
 | :--- | :---: | :---: | :---: | :---: |
-| **Sprint 1: Foundation** | 27 | 49 | 55.1% | In Progress |
+| **Sprint 1: Foundation** | 33 | 49 | 67.3% | In Progress |
 | **Sprint 2: Core Engine** | 1 | 31 | 3.2% | Not Started |
 | **Sprint 3: Polish & Admin** | 0 | 39 | 0.0% | Not Started |
 | **Sprint 4: Differentiation**| 0 | 33 | 0.0% | Not Started |
-| **Total Project** | **28** | **152** | **18.4%** | **In Progress** |
+| **Total Project** | **34** | **152** | **22.4%** | **In Progress** |
 
 ---
 
@@ -56,21 +56,21 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 #### Day 6–7: Auth Module (Backend)
 - [x] **Create RegisterUser use case** — Implemented in [RegisterUser.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/auth/RegisterUser.ts).
 - [x] **Create LoginUser use case** — Implemented in [LoginUser.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/auth/LoginUser.ts).
-- [ ] **Create RefreshToken use case**
+- [x] **Create RefreshToken use case** — Implemented in [RefreshToken.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/auth/RefreshToken.ts).
 - [x] **Create AuthController** — Implemented in [AuthController.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/controllers/AuthController.ts).
 - [x] **Create authenticate middleware (JWT verification)** — Implemented in [authenticate.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/middleware/authenticate.ts).
-- [ ] **Create authorize middleware (role-based)**
+- [x] **Create authorize middleware (role-based)** — Implemented in [authorize.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/middleware/authorize.ts).
 - [x] **Create validate-request middleware (Zod)** — Implemented in [validate-request.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/middleware/validate-request.ts).
 - [x] **Create error-handler middleware** — Implemented in [error-handler.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/middleware/error-handler.ts).
-- [ ] **Create rate-limiter middleware**
+- [x] **Create rate-limiter middleware** — Implemented in [rate-limiter.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/middleware/rate-limiter.ts).
 - [x] **Setup auth routes** — Implemented in [auth.routes.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/routes/auth.routes.ts) and mounted in [routes/index.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/routes/index.ts).
 - [ ] **Write unit tests for RegisterUser and LoginUser**
 
 #### Day 8–9: Problem Listing (Backend & Frontend)
 - [x] **Create GetProblems use case (with filters, search, pagination)** — Implemented in [GetProblems.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/problem/GetProblems.ts).
-- [ ] **Create GetProblemBySlug use case**
-- [ ] **Create ProblemController**
-- [ ] **Setup problem routes**
+- [x] **Create GetProblemBySlug use case** — Implemented in [GetProblemBySlug.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/problem/GetProblemBySlug.ts).
+- [x] **Create ProblemController** — Implemented in [ProblemController.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/controllers/ProblemController.ts).
+- [x] **Setup problem routes** — Implemented in [problem.routes.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/routes/problem.routes.ts).
 - [ ] **Write unit tests for GetProblems**
 
 #### Day 9–10: Frontend Auth & Problem Pages

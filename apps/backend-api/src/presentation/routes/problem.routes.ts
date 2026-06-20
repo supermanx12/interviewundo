@@ -1,0 +1,25 @@
+import { Router } from 'express';
+import { container } from '../../container';
+import { validateRequest } from '../middleware/validate-request';
+import { ProblemFilterSchema } from '@interviewprep/shared-types';
+
+const problemRoutes = Router();
+
+// GET /api/problems
+problemRoutes.get(
+  '/',
+  validateRequest(ProblemFilterSchema, 'query'),
+  (req, res, next) => {
+    container.controllers.problemController.list(req, res, next);
+  }
+);
+
+// GET /api/problems/:slug
+problemRoutes.get(
+  '/:slug',
+  (req, res, next) => {
+    container.controllers.problemController.getBySlug(req, res, next);
+  }
+);
+
+export { problemRoutes };
