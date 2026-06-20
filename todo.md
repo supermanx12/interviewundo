@@ -9,10 +9,10 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 | Phase                         | Completed Tasks | Total Tasks | Completion % |     Status      |
 | :---------------------------- | :-------------: | :---------: | :----------: | :-------------: |
 | **Sprint 1: Foundation**      |       54        |     54      |    100.0%    |    Completed    |
-| **Sprint 2: Core Engine**     |        8        |     32      |    25.0%     |   In Progress   |
+| **Sprint 2: Core Engine**     |       10        |     32      |    31.3%     |   In Progress   |
 | **Sprint 3: Polish & Admin**  |        0        |     34      |     0.0%     |   Not Started   |
 | **Sprint 4: Differentiation** |        0        |     33      |     0.0%     |   Not Started   |
-| **Total Project**             |     **62**      |   **153**   |  **40.5%**   | **In Progress** |
+| **Total Project**             |     **64**      |   **153**   |  **41.8%**   | **In Progress** |
 
 ---
 
@@ -127,8 +127,8 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 - [ ] **Create RunCode use case** (playground mode — run without saving)
 - [ ] **Create GetSubmissions use case**
 - [ ] **Create GetSubmissionResult use case**
-- [ ] **Create SubmissionController**
-- [ ] **Setup submission routes**
+- [x] **Create SubmissionController**
+- [x] **Setup submission routes**
 - [ ] **Configure BullMQ queue connection**
 - [ ] **Create BullMQQueueService** (implements `IQueueService`)
 - [ ] **Write unit tests for SubmitSolution**
