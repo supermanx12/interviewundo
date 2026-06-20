@@ -8,11 +8,11 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 | Phase | Completed Tasks | Total Tasks | Completion % | Status |
 | :--- | :---: | :---: | :---: | :---: |
-| **Sprint 1: Foundation** | 43 | 49 | 87.7% | In Progress |
+| **Sprint 1: Foundation** | 46 | 49 | 93.8% | In Progress |
 | **Sprint 2: Core Engine** | 1 | 31 | 3.2% | Not Started |
 | **Sprint 3: Polish & Admin** | 0 | 39 | 0.0% | Not Started |
 | **Sprint 4: Differentiation**| 0 | 33 | 0.0% | Not Started |
-| **Total Project** | **44** | **152** | **28.9%** | **In Progress** |
+| **Total Project** | **47** | **152** | **30.9%** | **In Progress** |
 
 ---
 
@@ -81,9 +81,9 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 - [x] **Create auth service** (API calls wrapper) — Created central request handler `apiFetch` in [AuthProvider.tsx](file:///d:/interview-prep-platform/apps/frontend/src/providers/AuthProvider.tsx).
 - [x] **Create auth hooks** (`useLogin`, `useRegister`, `useCurrentUser`) — Unified inside `useAuth` hook in [AuthProvider.tsx](file:///d:/interview-prep-platform/apps/frontend/src/providers/AuthProvider.tsx).
 - [x] **Create auth guard component** — Created route protector [AuthGuard.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/auth/AuthGuard.tsx).
-- [ ] **Create problem listing page**
-- [ ] **Create ProblemCard component**
-- [ ] **Create ProblemFilters component** (category, difficulty, search)
+- [x] **Create problem listing page** — Created in [problems/page.tsx](file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/problems/page.tsx).
+- [x] **Create ProblemCard component** — Built tabular layout inside [problems/page.tsx](file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/problems/page.tsx).
+- [x] **Create ProblemFilters component** (category, difficulty, search) — Integrated filter bar inside [problems/page.tsx](file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/problems/page.tsx).
 - [x] **Create sidebar layout with navigation** — Created in [Sidebar.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/layout/Sidebar.tsx) and [DashboardLayout.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/layout/DashboardLayout.tsx).
 - [x] **Setup dark/light theme toggle** — Created in [ThemeToggle.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/layout/ThemeToggle.tsx).
 - [x] **Create DifficultyBadge component** — Created in [difficulty-badge.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/ui/difficulty-badge.tsx).
