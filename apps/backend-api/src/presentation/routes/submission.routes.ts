@@ -21,4 +21,14 @@ submissionRoutes.post('/run', authenticate, validateRequest(RunCodeSchema), (req
   container.controllers.submissionController.run(req, res, next);
 });
 
+// GET /api/submissions
+submissionRoutes.get('/', authenticate, (req, res, next) => {
+  container.controllers.submissionController.list(req, res, next);
+});
+
+// GET /api/submissions/:id
+submissionRoutes.get('/:id', authenticate, (req, res, next) => {
+  container.controllers.submissionController.getById(req, res, next);
+});
+
 export { submissionRoutes };

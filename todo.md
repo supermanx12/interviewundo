@@ -9,10 +9,10 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 | Phase                         | Completed Tasks | Total Tasks | Completion % |     Status      |
 | :---------------------------- | :-------------: | :---------: | :----------: | :-------------: |
 | **Sprint 1: Foundation**      |       54        |     54      |    100.0%    |    Completed    |
-| **Sprint 2: Core Engine**     |       12        |     32      |    37.5%     |   In Progress   |
+| **Sprint 2: Core Engine**     |       14        |     32      |    43.8%     |   In Progress   |
 | **Sprint 3: Polish & Admin**  |        0        |     34      |     0.0%     |   Not Started   |
 | **Sprint 4: Differentiation** |        0        |     33      |     0.0%     |   Not Started   |
-| **Total Project**             |     **66**      |   **153**   |  **43.1%**   | **In Progress** |
+| **Total Project**             |     **68**      |   **153**   |  **44.4%**   | **In Progress** |
 
 ---
 
@@ -125,8 +125,8 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 - [x] **Create SubmitSolution use case** — Implemented in [SubmitSolution.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/submission/SubmitSolution.ts).
 - [x] **Create RunCode use case** (playground mode — run without saving)
-- [ ] **Create GetSubmissions use case**
-- [ ] **Create GetSubmissionResult use case**
+- [x] **Create GetSubmissions use case**
+- [x] **Create GetSubmissionResult use case**
 - [x] **Create SubmissionController**
 - [x] **Setup submission routes**
 - [ ] **Configure BullMQ queue connection**

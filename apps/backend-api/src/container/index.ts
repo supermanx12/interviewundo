@@ -20,6 +20,8 @@ import { GetProblems } from '../application/use-cases/problem/GetProblems';
 import { GetProblemBySlug } from '../application/use-cases/problem/GetProblemBySlug';
 import { SubmitSolution } from '../application/use-cases/submission/SubmitSolution';
 import { RunCode } from '../application/use-cases/submission/RunCode';
+import { GetSubmissions } from '../application/use-cases/submission/GetSubmissions';
+import { GetSubmissionResult } from '../application/use-cases/submission/GetSubmissionResult';
 
 // --- Controllers ---
 import { AuthController } from '../presentation/controllers/AuthController';
@@ -73,11 +75,18 @@ const submitSolution = new SubmitSolution(
   mockNotificationService,
 );
 const runCode = new RunCode(problemRepository, mockQueueService);
+const getSubmissions = new GetSubmissions(submissionRepository);
+const getSubmissionResult = new GetSubmissionResult(submissionRepository);
 
 // Step 3: Instantiate controllers
 const authController = new AuthController(registerUser, loginUser, refreshToken);
 const problemController = new ProblemController(getProblems, getProblemBySlug);
-const submissionController = new SubmissionController(submitSolution, runCode);
+const submissionController = new SubmissionController(
+  submitSolution,
+  runCode,
+  getSubmissions,
+  getSubmissionResult,
+);
 
 // Step 4: Export container
 export const container = {
@@ -99,6 +108,8 @@ export const container = {
     getProblemBySlug,
     submitSolution,
     runCode,
+    getSubmissions,
+    getSubmissionResult,
   },
   controllers: {
     authController,
