@@ -106,7 +106,7 @@ export default function Home() {
                 href="/problems/daily"
                 className={cn(
                   buttonVariants({ variant: 'outline' }),
-                  "border border-white/20 text-white hover:bg-white/10 hover:text-white rounded-xl font-semibold active:scale-95 transition-all flex items-center gap-2"
+                  "border border-white/20 text-blue-600 hover:bg-blue-400/10 hover:text-blue-400 rounded-xl font-semibold active:scale-95 transition-all flex items-center gap-2"
                 )}
               >
                 <BookOpen size={16} />
