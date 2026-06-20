@@ -17,7 +17,15 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "cache": false
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "REDIS_URL",
+        "JWT_ACCESS_SECRET",
+        "JWT_REFRESH_SECRET",
+        "PORT",
+        "NODE_ENV"
+      ]
     },
     "test:e2e": {
       "cache": false

@@ -139,28 +139,29 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 #### Day 15–17: Judge Worker Service
 
-- [ ] **Setup apps/judge-worker project workspace**
-- [ ] **Create Docker runner image** (`node:22-slim` based)
-- [ ] **Create JavaScript executor engine**:
+- [x] **Setup apps/judge-worker project workspace**
+- [x] **Create Docker runner image** (`node:22-slim` based)
+- [x] **Create JavaScript executor engine**:
   - Generate `solution.js` from user code
   - Generate `runner.js` with test case injection
   - Execute inside Docker container via `dockerode`
   - Capture stdout, stderr, and exit codes
   - Enforce resource limits (memory: 256MB, CPU: 1, timeout: 10s)
   - Parse and compare outputs
-- [ ] **Create BullMQ worker that processes submission jobs**
-- [ ] **Update submission status in database** (PENDING → PROCESSING → result)
-- [ ] **Write unit tests for executor** (at least 10 test scenarios)
+- [x] **Create BullMQ worker that processes submission jobs**
+- [x] **Update submission status in database** (PENDING → PROCESSING → result)
+- [x] **Write unit tests for executor** (at least 10 test scenarios)
+      Base workspace configuration complete.
 
 #### Day 18–19: WebSocket & Real-Time Updates
 
-- [ ] **Setup Socket.io on backend**
-- [ ] **Create SocketIOService** (implements `INotificationService`)
-- [ ] **Authenticate WebSocket connections** (JWT verification)
-- [ ] **Emit status updates** (PENDING → PROCESSING → ACCEPTED/etc.)
-- [ ] **Create `useSubmissionStatus` hook** (frontend WebSocket listener)
-- [ ] **Update output panel with real-time status**
-- [ ] **Show animated processing indicator**
+- [x] **Setup Socket.io on backend**
+- [x] **Create SocketIOService** (implements `INotificationService`)
+- [x] **Authenticate WebSocket connections** (JWT verification)
+- [x] **Emit status updates** (PENDING → PROCESSING → ACCEPTED/etc.)
+- [x] **Create `useSubmissionStatus` hook** (frontend SocketProvider and listener integration)
+- [x] **Update output panel with real-time status**
+- [x] **Show animated processing indicator**
 
 #### Day 20: Integration Testing
 

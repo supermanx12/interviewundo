@@ -2,7 +2,10 @@ import { app } from './app';
 import { env } from './config/env';
 import { logger } from './config/logger';
 import { prisma } from './config/database';
-import { redis } from './config/redis';
+import { redis, redisSubscriber } from './config/redis';
+import { Server as SocketIOServer } from 'socket.io';
+import { socketIOService } from './infrastructure/notification/SocketIOService';
+import { container } from './container';
 
 // ============================================================
 // Server Entry Point — With Graceful Shutdown
@@ -13,6 +16,16 @@ const server = app.listen(env.PORT, () => {
   logger.info(`📖 Environment: ${env.NODE_ENV}`);
   logger.info(`🏥 Health check: http://localhost:${env.PORT}/health`);
 });
+
+// --- Initialize Socket.io Server ---
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: env.CORS_ORIGINS.split(','),
+    credentials: true,
+  },
+});
+
+socketIOService.initialize(io, container.services.authTokenService);
 
 // --- Graceful Shutdown ---
 async function gracefulShutdown(signal: string) {
@@ -28,7 +41,8 @@ async function gracefulShutdown(signal: string) {
 
     // Close Redis connection
     redis.disconnect();
-    logger.info('Redis disconnected');
+    redisSubscriber.disconnect();
+    logger.info('Redis connections disconnected');
 
     logger.info('✅ Graceful shutdown complete');
     process.exit(0);

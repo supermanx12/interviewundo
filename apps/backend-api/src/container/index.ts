@@ -13,6 +13,7 @@ import { Argon2PasswordService } from '../infrastructure/auth/Argon2PasswordServ
 import { RedisCacheService } from '../infrastructure/cache/RedisCacheService';
 import { BullMQQueueService } from '../infrastructure/queue/BullMQQueueService';
 import { submissionQueue } from '../infrastructure/queue/queues';
+import { socketIOService } from '../infrastructure/notification/SocketIOService';
 
 // --- Use Cases ---
 import { RegisterUser } from '../application/use-cases/auth/RegisterUser';
@@ -30,9 +31,6 @@ import { AuthController } from '../presentation/controllers/AuthController';
 import { ProblemController } from '../presentation/controllers/ProblemController';
 import { SubmissionController } from '../presentation/controllers/SubmissionController';
 
-// --- Interfaces for Mock Services ---
-import type { INotificationService } from '../domain/ports/services/INotificationService';
-
 // ============================================================
 // Wire Dependencies
 // ============================================================
@@ -46,14 +44,8 @@ const passwordService = new Argon2PasswordService();
 const cacheService = new RedisCacheService();
 const queueService = new BullMQQueueService(submissionQueue);
 
-const mockNotificationService: INotificationService = {
-  notifyUser: (userId, event, data) => {
-    console.log(`[Notification Mock] Notified user ${userId} of event ${event} with data:`, data);
-  },
-  notifyAll: (event, data) => {
-    console.log(`[Notification Mock] Broadcasted event ${event} with data:`, data);
-  },
-};
+// Use real SocketIOService as the notification service
+const notificationService = socketIOService;
 
 // Step 2: Instantiate use cases with injected dependencies
 const registerUser = new RegisterUser(userRepository, passwordService, authTokenService);
@@ -65,7 +57,7 @@ const submitSolution = new SubmitSolution(
   submissionRepository,
   problemRepository,
   queueService,
-  mockNotificationService,
+  notificationService,
 );
 const runCode = new RunCode(problemRepository, queueService);
 const getSubmissions = new GetSubmissions(submissionRepository);

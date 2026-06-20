@@ -18,3 +18,15 @@ redis.on('connect', () => {
 redis.on('error', (err) => {
   logger.error({ err }, '❌ Redis connection error');
 });
+
+export const redisSubscriber = new Redis(env.REDIS_URL, {
+  enableReadyCheck: false,
+});
+
+redisSubscriber.on('connect', () => {
+  logger.info('✅ Redis subscriber connected');
+});
+
+redisSubscriber.on('error', (err) => {
+  logger.error({ err }, '❌ Redis subscriber connection error');
+});

@@ -4,13 +4,14 @@ import React from 'react';
 import { AuthProvider } from './AuthProvider';
 import { QueryProvider } from './QueryProvider';
 import { ThemeProvider } from './ThemeProvider';
+import { SocketProvider } from './SocketProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <QueryProvider>
         <AuthProvider>
-          {children}
+          <SocketProvider>{children}</SocketProvider>
         </AuthProvider>
       </QueryProvider>
     </ThemeProvider>
@@ -18,3 +19,4 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 
 export { useAuth } from './AuthProvider';
+export { useSocket } from './SocketProvider';

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
-import { useAuth } from '@/providers';
+import { useAuth, useSocket } from '@/providers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DifficultyBadge } from '@/components/ui/difficulty-badge';
@@ -28,6 +28,7 @@ export default function ProblemWorkspacePage() {
   const { slug } = useParams() as { slug: string };
   const router = useRouter();
   const { apiFetch } = useAuth();
+  const socket = useSocket();
 
   // Workspace Settings
   const [editorTheme, setEditorTheme] = useState<'vs-dark' | 'light'>('vs-dark');
@@ -42,6 +43,7 @@ export default function ProblemWorkspacePage() {
   const [consoleTab, setConsoleTab] = useState<'testcases' | 'result'>('testcases');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<{
     status: string;
     stdout?: string;
@@ -111,36 +113,135 @@ export default function ProblemWorkspacePage() {
     }
   };
 
+  // Listen for real-time WebSocket updates
+  useEffect(() => {
+    if (!socket || !activeJobId) return;
+
+    const handleStatusUpdate = (payload: {
+      submissionId: string;
+      status: string;
+      data?: any;
+      error?: string;
+    }) => {
+      console.log('Received WebSocket submission:status update:', payload);
+      if (payload.submissionId !== activeJobId) return;
+
+      if (payload.status === 'PROCESSING') {
+        setConsoleOutput({
+          status: 'Processing',
+          stdout: 'Executing test cases inside Docker container...',
+        });
+      } else {
+        // Final status reached!
+        setIsRunning(false);
+        setIsSubmitting(false);
+        setActiveJobId(null);
+
+        let stdout = '';
+        if (payload.data?.results) {
+          const results = payload.data.results as Array<{
+            id: string;
+            passed: boolean;
+            actual: any;
+            expected: any;
+            runtime: number;
+            stdout?: string;
+          }>;
+          stdout = results
+            .map((res, i) => {
+              const tcTitle = `Test Case ${i + 1}: ${res.passed ? 'PASSED ✅' : 'FAILED ❌'} (${res.runtime}ms)`;
+              const actStr = JSON.stringify(res.actual);
+              const expStr = JSON.stringify(res.expected);
+              const runLog = res.stdout ? `\nLogs:\n${res.stdout}` : '';
+              return `${tcTitle}\nExpected: ${expStr}\nReceived: ${actStr}${runLog}`;
+            })
+            .join('\n\n');
+        } else if (payload.data) {
+          const d = payload.data;
+          stdout = `Passed Cases: ${d.passedCases} / ${d.totalCases}\nRuntime: ${d.runtime} ms\nMemory: ${typeof d.memory === 'number' ? (d.memory / 1024 / 1024).toFixed(2) : 0} MB`;
+        } else if (payload.error) {
+          stdout = payload.error;
+        }
+
+        setConsoleOutput({
+          status: payload.status,
+          stdout,
+          passed:
+            payload.status === 'ACCEPTED' ||
+            payload.status === 'Finished' ||
+            payload.status === 'SUCCESS',
+          error:
+            payload.error ||
+            (payload.status !== 'ACCEPTED' && payload.status !== 'Finished'
+              ? 'Some test cases failed.'
+              : undefined),
+        });
+      }
+    };
+
+    socket.on('submission:status', handleStatusUpdate);
+
+    return () => {
+      socket.off('submission:status', handleStatusUpdate);
+    };
+  }, [socket, activeJobId]);
+
   const handleRunCode = async () => {
+    if (!problem?.id) return;
     setIsRunning(true);
     setConsoleTab('result');
-    setConsoleOutput(null);
+    setConsoleOutput({
+      status: 'Queueing',
+      stdout: 'Queueing code run in the sandbox...',
+    });
 
-    // Mock code execution delay
-    setTimeout(() => {
+    try {
+      const result = await apiFetch<{ jobId: string; status: string }>('/api/submissions/run', {
+        method: 'POST',
+        body: JSON.stringify({
+          problemId: problem.id,
+          code,
+          language,
+        }),
+      });
+
+      setActiveJobId(result.jobId);
+    } catch (err: any) {
       setIsRunning(false);
       setConsoleOutput({
-        status: 'Finished',
-        stdout: `Success! All mock tests passed in ${language}.`,
-        passed: true,
+        status: 'Error',
+        error: err.message || 'Failed to trigger playground run',
       });
-    }, 1500);
+    }
   };
 
   const handleSubmitCode = async () => {
+    if (!problem?.id) return;
     setIsSubmitting(true);
     setConsoleTab('result');
-    setConsoleOutput(null);
+    setConsoleOutput({
+      status: 'Queueing',
+      stdout: 'Queueing submission in the judge...',
+    });
 
-    // Mock submit code execution delay
-    setTimeout(() => {
+    try {
+      const result = await apiFetch<{ id: string; status: string }>('/api/submissions', {
+        method: 'POST',
+        body: JSON.stringify({
+          problemId: problem.id,
+          code,
+          language,
+        }),
+      });
+
+      setActiveJobId(result.id);
+    } catch (err: any) {
       setIsSubmitting(false);
       setConsoleOutput({
-        status: 'Accepted',
-        stdout: `All test cases passed in ${language}!\nRuntime: 76 ms\nMemory: 42.1 MB`,
-        passed: true,
+        status: 'Error',
+        error: err.message || 'Failed to trigger solution submission',
       });
-    }, 2000);
+    }
   };
 
   if (isLoading) {

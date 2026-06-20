@@ -1,35 +1,52 @@
-import pino from 'pino';
+import { logger } from './config/logger';
+import { prisma } from './config/database';
+import { redis } from './config/redis';
+import { submissionWorker } from './worker/SubmissionWorker';
 
 // ============================================================
-// Judge Worker — Entry Point
-// Consumes submission jobs from BullMQ and executes them
-// inside Docker containers
+// Judge Worker — Process Bootstrap
 // ============================================================
 
-const logger = pino({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  transport:
-    process.env.NODE_ENV !== 'production'
-      ? { target: 'pino-pretty', options: { colorize: true } }
-      : undefined,
+logger.info('🏗️  Judge Worker process bootstrap initialized...');
+
+// Graceful Shutdown Logic
+async function gracefulShutdown(signal: string) {
+  logger.info({ signal }, 'Received kill signal. Starting graceful shutdown...');
+
+  try {
+    // 1. Pause worker to stop accepting new jobs
+    logger.info('Pausing BullMQ worker...');
+    await submissionWorker.close();
+    logger.info('BullMQ worker closed.');
+
+    // 2. Disconnect Prisma
+    logger.info('Disconnecting Prisma Client...');
+    await prisma.$disconnect();
+    logger.info('Prisma disconnected.');
+
+    // 3. Disconnect Redis
+    logger.info('Disconnecting Redis Client...');
+    await redis.quit();
+    logger.info('Redis disconnected.');
+
+    logger.info('👋 Graceful shutdown complete. Exiting process.');
+    process.exit(0);
+  } catch (err) {
+    logger.error({ err }, 'Error during graceful shutdown');
+    process.exit(1);
+  }
+}
+
+// Intercept signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Catch unhandled errors to log them
+process.on('unhandledRejection', (reason, promise) => {
+  logger.fatal({ reason, promise }, 'Unhandled Rejection at Promise');
 });
 
-logger.info('🏗️  Judge Worker starting...');
-logger.info('📋 Waiting for submission jobs...');
-
-// TODO (Sprint 2): 
-// 1. Connect to Redis and create BullMQ Worker
-// 2. Define job processor that:
-//    a. Reads submission data from job
-//    b. Creates a Docker container (node:22-slim)
-//    c. Generates solution.js and runner.js files
-//    d. Mounts files into container
-//    e. Executes with resource limits (CPU, memory, timeout)
-//    f. Captures stdout/stderr
-//    g. Compares output against expected test case results
-//    h. Updates submission status in database
-//    i. Notifies user via WebSocket
-// 3. Handle graceful shutdown (drain queue)
-
-// Placeholder to keep the process alive
-setInterval(() => {}, 60000);
+process.on('uncaughtException', (error) => {
+  logger.fatal({ error }, 'Uncaught Exception thrown');
+  gracefulShutdown('UNCAUGHT_EXCEPTION');
+});
