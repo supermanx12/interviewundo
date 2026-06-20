@@ -1,65 +1,253 @@
-import Image from "next/image";
+'use client';
+
+import React from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { DifficultyBadge } from '@/components/ui/difficulty-badge';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+  Code,
+  BookOpen,
+  Trophy,
+  Activity,
+  Flame,
+  ArrowRight,
+  PlayCircle,
+  ExternalLink,
+} from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
+  const stats = [
+    {
+      label: 'Problems Solved',
+      value: '18 / 150',
+      description: '12% complete',
+      icon: Code,
+      color: 'text-indigo-500',
+    },
+    {
+      label: 'Success Rate',
+      value: '76.4%',
+      description: '+2.1% this week',
+      icon: Trophy,
+      color: 'text-amber-500',
+    },
+    {
+      label: 'Active Streak',
+      value: '3 Days',
+      description: 'Keep the flame alive!',
+      icon: Flame,
+      color: 'text-orange-500',
+    },
+    {
+      label: 'Submissions',
+      value: '34 Total',
+      description: '12 accepted solutions',
+      icon: Activity,
+      color: 'text-emerald-500',
+    },
+  ];
+
+  const recentProblems = [
+    {
+      title: 'Two Sum',
+      category: 'Arrays & Hashing',
+      difficulty: 'EASY',
+      slug: 'two-sum',
+      successRate: '92%',
+    },
+    {
+      title: 'Longest Substring Without Repeating Characters',
+      category: 'Sliding Window',
+      difficulty: 'MEDIUM',
+      slug: 'longest-substring-without-repeating-characters',
+      successRate: '68%',
+    },
+    {
+      title: 'LRU Cache',
+      category: 'Design',
+      difficulty: 'HARD',
+      slug: 'lru-cache',
+      successRate: '41%',
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <DashboardLayout>
+      <div className="space-y-8 pb-12">
+        {/* Welcome Section */}
+        <div className="rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 p-8 text-white relative overflow-hidden shadow-lg shadow-indigo-500/10">
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 max-w-xl space-y-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold backdrop-blur-md">
+              <Sparkles width={12} height={12} className="animate-spin" />
+              Sprint 1 Launching Ready
+            </span>
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Welcome back to CodePrep!
+            </h2>
+            <p className="text-indigo-100 text-sm md:text-base leading-relaxed">
+              Enhance your problem-solving capabilities, master JavaScript/React, and ace your technical interviews with real-time feedback.
+            </p>
+            <div className="pt-2 flex flex-wrap gap-3">
+              <Link
+                href="/problems"
+                className={cn(
+                  buttonVariants({ variant: 'default' }),
+                  "bg-white text-indigo-600 hover:bg-indigo-50 rounded-xl font-semibold shadow-md active:scale-95 transition-all flex items-center gap-2"
+                )}
+              >
+                <PlayCircle size={16} />
+                Start Solving
+              </Link>
+              <Link
+                href="/problems/daily"
+                className={cn(
+                  buttonVariants({ variant: 'outline' }),
+                  "border border-white/20 text-white hover:bg-white/10 hover:text-white rounded-xl font-semibold active:scale-95 transition-all flex items-center gap-2"
+                )}
+              >
+                <BookOpen size={16} />
+                Daily Challenge
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={idx} className="border-border bg-card/40 backdrop-blur-sm hover:shadow-md transition-all duration-300">
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {stat.label}
+                    </p>
+                    <p className="text-2xl font-bold tracking-tight text-foreground">
+                      {stat.value}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground/80">
+                      {stat.description}
+                    </p>
+                  </div>
+                  <div className={`p-3 rounded-2xl bg-muted/50 ${stat.color}`}>
+                    <Icon size={22} className="stroke-[2.5]" />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
-      </main>
-    </div>
+
+        {/* Grid Sections */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Recommended Problems */}
+          <Card className="lg:col-span-2 border-border bg-card/30 backdrop-blur-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-lg">Recommended for You</CardTitle>
+                <CardDescription>Handpicked problems to match your skill level</CardDescription>
+              </div>
+              <Link
+                href="/problems"
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  "text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-accent rounded-lg flex items-center gap-1.5"
+                )}
+              >
+                View All
+                <ArrowRight size={13} />
+              </Link>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentProblems.map((prob, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-4 rounded-2xl border border-border/60 hover:bg-accent/40 transition-all duration-200 group"
+                >
+                  <div className="space-y-1 min-w-0 flex-1 pr-4">
+                    <Link
+                      href={`/problems/${prob.slug}`}
+                      className="font-semibold text-sm hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5"
+                    >
+                      {prob.title}
+                      <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                    <p className="text-xs text-muted-foreground">
+                      {prob.category} • Success rate: {prob.successRate}
+                    </p>
+                  </div>
+                  <DifficultyBadge difficulty={prob.difficulty} />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Quick Learning Card */}
+          <Card className="border-border bg-card/30 backdrop-blur-sm flex flex-col justify-between">
+            <CardHeader>
+              <CardTitle className="text-lg">Prep Plan Overview</CardTitle>
+              <CardDescription>Current path: Frontend Master</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 flex-1">
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-muted-foreground">JavaScript Core</span>
+                  <span className="text-emerald-500">80% Done</span>
+                </div>
+                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="w-[80%] h-full bg-emerald-500 rounded-full" />
+                </div>
+              </div>
+
+              <div className="space-y-3.5 pt-2">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-muted-foreground">React & Virtual DOM</span>
+                  <span className="text-indigo-500">45% Done</span>
+                </div>
+                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="w-[45%] h-full bg-indigo-500 rounded-full" />
+                </div>
+              </div>
+
+              <div className="space-y-3.5 pt-2">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-muted-foreground">Node.js Basics</span>
+                  <span className="text-muted-foreground/60">Not Started</span>
+                </div>
+                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="w-0 h-full bg-muted-foreground rounded-full" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}
+
+function Sparkles(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+      <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z" />
+      <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z" />
+    </svg>
   );
 }

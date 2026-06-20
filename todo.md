@@ -8,11 +8,11 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 | Phase | Completed Tasks | Total Tasks | Completion % | Status |
 | :--- | :---: | :---: | :---: | :---: |
-| **Sprint 1: Foundation** | 33 | 49 | 67.3% | In Progress |
+| **Sprint 1: Foundation** | 38 | 49 | 77.6% | In Progress |
 | **Sprint 2: Core Engine** | 1 | 31 | 3.2% | Not Started |
 | **Sprint 3: Polish & Admin** | 0 | 39 | 0.0% | Not Started |
 | **Sprint 4: Differentiation**| 0 | 33 | 0.0% | Not Started |
-| **Total Project** | **34** | **152** | **22.4%** | **In Progress** |
+| **Total Project** | **39** | **152** | **25.7%** | **In Progress** |
 
 ---
 
@@ -74,8 +74,8 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 - [ ] **Write unit tests for GetProblems**
 
 #### Day 9–10: Frontend Auth & Problem Pages
-- [ ] **Setup shadcn/ui on frontend**
-- [ ] **Create root layout with providers** (QueryClient, Theme, Auth)
+- [x] **Setup shadcn/ui on frontend** — Configured and initialized.
+- [x] **Create root layout with providers** (QueryClient, Theme, Auth) — Created in [layout.tsx](file:///d:/interview-prep-platform/apps/frontend/src/app/layout.tsx) and [providers/index.tsx](file:///d:/interview-prep-platform/apps/frontend/src/providers/index.tsx).
 - [ ] **Create login page with form validation**
 - [ ] **Create register page with form validation**
 - [ ] **Create auth service** (API calls wrapper)
@@ -84,9 +84,9 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 - [ ] **Create problem listing page**
 - [ ] **Create ProblemCard component**
 - [ ] **Create ProblemFilters component** (category, difficulty, search)
-- [ ] **Create sidebar layout with navigation**
-- [ ] **Setup dark/light theme toggle**
-- [ ] **Create DifficultyBadge component**
+- [x] **Create sidebar layout with navigation** — Created in [Sidebar.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/layout/Sidebar.tsx) and [DashboardLayout.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/layout/DashboardLayout.tsx).
+- [x] **Setup dark/light theme toggle** — Created in [ThemeToggle.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/layout/ThemeToggle.tsx).
+- [x] **Create DifficultyBadge component** — Created in [difficulty-badge.tsx](file:///d:/interview-prep-platform/apps/frontend/src/components/ui/difficulty-badge.tsx).
 
 #### Day 10: CI & First Deploy
 - [ ] **Create GitHub Actions CI workflow** (`lint` → `typecheck` → `test` → `build`)
