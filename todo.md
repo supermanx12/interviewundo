@@ -8,11 +8,11 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 | Phase                         | Completed Tasks | Total Tasks | Completion % |     Status      |
 | :---------------------------- | :-------------: | :---------: | :----------: | :-------------: |
-| **Sprint 1: Foundation**      |       49        |     54      |    90.7%     |   In Progress   |
+| **Sprint 1: Foundation**      |       51        |     54      |    94.4%     |   In Progress   |
 | **Sprint 2: Core Engine**     |        1        |     32      |     3.1%     |   Not Started   |
 | **Sprint 3: Polish & Admin**  |        0        |     34      |     0.0%     |   Not Started   |
 | **Sprint 4: Differentiation** |        0        |     33      |     0.0%     |   Not Started   |
-| **Total Project**             |     **50**      |   **153**   |  **32.7%**   | **In Progress** |
+| **Total Project**             |     **52**      |   **153**   |  **34.0%**   | **In Progress** |
 
 ---
 
@@ -39,8 +39,8 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 - [x] **Create Prisma schema** — All required models defined in [schema.prisma](file:///d:/interview-prep-platform/apps/backend-api/src/infrastructure/database/prisma/schema.prisma).
 - [x] **Run initial database migration** — Database is fully migrated with initial structures on port 5433.
 - [x] **Write database seed script** — Implemented in [seed.ts](file:///d:/interview-prep-platform/apps/backend-api/src/infrastructure/database/prisma/seed.ts) (seeded with 15+ rich interview problems).
-- [ ] **Create domain entities** (User, Problem, TestCase, Submission)
-- [ ] **Create value objects** (Email, Slug, Difficulty, SubmissionStatus)
+- [x] **Create domain entities** (User, Problem, TestCase, Submission)
+- [x] **Create value objects** (Email, Slug, Difficulty, SubmissionStatus)
 - [x] **Create domain errors** — Implemented in [domain/errors](file:///d:/interview-prep-platform/apps/backend-api/src/domain/errors/index.ts).
 - [x] **Create port interfaces** — Defined in [domain/ports](file:///d:/interview-prep-platform/apps/backend-api/src/domain/ports/index.ts):
   - Repository Ports: [IUserRepository](file:///d:/interview-prep-platform/apps/backend-api/src/domain/ports/repositories/IUserRepository.ts), [IProblemRepository](file:///d:/interview-prep-platform/apps/backend-api/src/domain/ports/repositories/IProblemRepository.ts), [ISubmissionRepository](file:///d:/interview-prep-platform/apps/backend-api/src/domain/ports/repositories/ISubmissionRepository.ts), [ITestCaseRepository](file:///d:/interview-prep-platform/apps/backend-api/src/domain/ports/repositories/ITestCaseRepository.ts)
