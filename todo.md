@@ -8,11 +8,11 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 | Phase                         | Completed Tasks | Total Tasks | Completion % |     Status      |
 | :---------------------------- | :-------------: | :---------: | :----------: | :-------------: |
-| **Sprint 1: Foundation**      |       52        |     54      |    96.3%     |   In Progress   |
+| **Sprint 1: Foundation**      |       53        |     54      |    98.1%     |   In Progress   |
 | **Sprint 2: Core Engine**     |        1        |     32      |     3.1%     |   Not Started   |
 | **Sprint 3: Polish & Admin**  |        0        |     34      |     0.0%     |   Not Started   |
 | **Sprint 4: Differentiation** |        0        |     33      |     0.0%     |   Not Started   |
-| **Total Project**             |     **53**      |   **153**   |  **34.6%**   | **In Progress** |
+| **Total Project**             |     **54**      |   **153**   |  **35.3%**   | **In Progress** |
 
 ---
 
@@ -101,7 +101,7 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 - [x] **Create GitHub Actions CI workflow** (`lint` → `typecheck` → `test` → `build`)
 - [ ] **Deploy frontend workspace to Vercel (preview)**
-- [ ] **Test full auth flow end-to-end**
+- [x] **Test full auth flow end-to-end**
 
 ---
 
