@@ -21,7 +21,9 @@ export interface IProblemRepository {
 
   findBySlug(slug: string): Promise<Problem | null>;
 
-  findAll(filters: ProblemFilterDTO): Promise<{ data: Problem[]; total: number }>;
+  findAll(
+    filters: ProblemFilterDTO & { isPublished?: boolean },
+  ): Promise<{ data: Problem[]; total: number }>;
 
   update(id: string, data: Partial<Problem>): Promise<Problem>;
 
@@ -36,4 +38,8 @@ export interface IProblemRepository {
   countByCategory(): Promise<Record<string, number>>;
 
   countAll(): Promise<number>;
+
+  getDailyChallenge(date: Date): Promise<Problem | null>;
+
+  setDailyChallenge(problemId: string, date: Date): Promise<Problem>;
 }

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import Editor from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
-import { useAuth, useSocket } from '@/providers';
+import { useAuth, useSocket, useToast } from '@/providers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DifficultyBadge } from '@/components/ui/difficulty-badge';
@@ -31,6 +31,7 @@ export default function ProblemWorkspacePage() {
   const router = useRouter();
   const { apiFetch } = useAuth();
   const socket = useSocket();
+  const { success: showSuccess, error: showError, info: showInfo } = useToast();
 
   // Workspace Settings
   const [editorTheme, setEditorTheme] = useState<'vs-dark' | 'light'>('vs-dark');
@@ -139,6 +140,24 @@ export default function ProblemWorkspacePage() {
         setIsSubmitting(false);
         setActiveJobId(null);
 
+        if (
+          payload.status === 'ACCEPTED' ||
+          payload.status === 'SUCCESS' ||
+          payload.status === 'Finished'
+        ) {
+          showSuccess('All tests passed! Solution Accepted.');
+        } else if (payload.status === 'WRONG_ANSWER') {
+          showError('Wrong Answer: Some test cases failed.');
+        } else if (payload.status === 'TIME_LIMIT_EXCEEDED') {
+          showError('Time Limit Exceeded.');
+        } else if (payload.status === 'RUNTIME_ERROR') {
+          showError('Runtime Error: Check logs.');
+        } else if (payload.status === 'COMPILATION_ERROR') {
+          showError('Compilation Error: Check syntax.');
+        } else {
+          showError('Execution failed: ' + payload.status);
+        }
+
         let stdout = '';
         if (payload.error) {
           stdout = payload.error;
@@ -196,6 +215,7 @@ export default function ProblemWorkspacePage() {
       status: 'Queueing',
       stdout: 'Queueing code run in the sandbox...',
     });
+    showInfo('Code execution queued...');
 
     try {
       const result = await apiFetch<{ jobId: string; status: string }>('/api/submissions/run', {
@@ -210,10 +230,12 @@ export default function ProblemWorkspacePage() {
       setActiveJobId(result.jobId);
     } catch (err: any) {
       setIsRunning(false);
+      const errMsg = err.message || 'Failed to trigger playground run';
       setConsoleOutput({
         status: 'Error',
-        error: err.message || 'Failed to trigger playground run',
+        error: errMsg,
       });
+      showError(errMsg);
     }
   };
 
@@ -225,6 +247,7 @@ export default function ProblemWorkspacePage() {
       status: 'Queueing',
       stdout: 'Queueing submission in the judge...',
     });
+    showInfo('Solution submission queued...');
 
     try {
       const result = await apiFetch<{ id: string; status: string }>('/api/submissions', {
@@ -239,26 +262,17 @@ export default function ProblemWorkspacePage() {
       setActiveJobId(result.id);
     } catch (err: any) {
       setIsSubmitting(false);
+      const errMsg = err.message || 'Failed to trigger solution submission';
       setConsoleOutput({
         status: 'Error',
-        error: err.message || 'Failed to trigger solution submission',
+        error: errMsg,
       });
+      showError(errMsg);
     }
   };
 
   if (isLoading) {
-    return (
-      <div className="h-[80vh] w-full flex flex-col items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Loader2 className="animate-spin text-white" size={24} />
-          </div>
-          <p className="text-sm font-semibold tracking-wide text-muted-foreground animate-pulse">
-            Loading problem workspace...
-          </p>
-        </div>
-      </div>
-    );
+    return <WorkspaceSkeleton />;
   }
 
   if (isError || !problem) {
@@ -574,6 +588,88 @@ export default function ProblemWorkspacePage() {
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Workspace Skeleton Loader
+// ============================================================
+
+function WorkspaceSkeleton() {
+  return (
+    <div className="flex flex-col h-[calc(100vh-5.5rem)] -m-4 overflow-hidden bg-background animate-pulse">
+      {/* Workspace Header Skeleton */}
+      <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-card/45 backdrop-blur-sm shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-8 bg-muted rounded-lg" />
+          <div className="h-4 w-px bg-border hidden sm:block" />
+          <div className="w-48 h-5 bg-muted rounded-md" />
+          <div className="w-16 h-5 bg-muted rounded-full" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-20 h-8 bg-muted rounded-lg" />
+          <div className="w-24 h-8 bg-muted rounded-lg" />
+          <div className="w-10 h-8 bg-muted rounded-lg" />
+        </div>
+      </div>
+
+      {/* Split Screen Workspace Body Skeleton */}
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        {/* Left Description Skeleton */}
+        <div className="w-1/2 flex flex-col border-r border-border bg-card/15 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20 shrink-0">
+            <div className="w-32 h-4 bg-muted rounded-md" />
+            <div className="w-24 h-4 bg-muted rounded-md" />
+          </div>
+          <div className="flex-1 p-6 space-y-4">
+            <div className="w-3/4 h-6 bg-muted rounded-md" />
+            <div className="w-1/2 h-4 bg-muted rounded-md" />
+            <div className="space-y-2.5 pt-4">
+              <div className="w-full h-4 bg-muted rounded-md" />
+              <div className="w-full h-4 bg-muted rounded-md" />
+              <div className="w-5/6 h-4 bg-muted rounded-md" />
+              <div className="w-2/3 h-4 bg-muted rounded-md" />
+            </div>
+            <div className="space-y-2.5 pt-6">
+              <div className="w-full h-4 bg-muted rounded-md" />
+              <div className="w-4/5 h-4 bg-muted rounded-md" />
+              <div className="w-full h-4 bg-muted rounded-md" />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Editor Skeleton */}
+        <div className="w-1/2 flex flex-col overflow-hidden bg-[#1e1e1e]">
+          <div className="flex items-center justify-between px-6 py-2 border-b border-border bg-[#181818] shrink-0">
+            <div className="w-24 h-4 bg-muted/30 rounded-md" />
+            <div className="w-20 h-7 bg-muted/30 rounded-md" />
+          </div>
+          <div className="flex-1 bg-[#1e1e1e] p-6 space-y-3">
+            <div className="w-[120px] h-4 bg-muted/20 rounded-md" />
+            <div className="w-[200px] h-4 bg-muted/20 rounded-md pl-6" />
+            <div className="w-[150px] h-4 bg-muted/20 rounded-md pl-6" />
+            <div className="w-[80px] h-4 bg-muted/20 rounded-md" />
+            <div className="w-[180px] h-4 bg-muted/20 rounded-md pl-6" />
+          </div>
+          <div className="h-60 border-t border-border bg-[#151515] p-6 flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-border bg-[#111111] -mx-6 -mt-6 p-4">
+              <div className="flex gap-2">
+                <div className="w-24 h-7 bg-muted/20 rounded-lg" />
+                <div className="w-20 h-7 bg-muted/20 rounded-lg" />
+              </div>
+              <div className="flex gap-2">
+                <div className="w-24 h-8 bg-muted/30 rounded-lg" />
+                <div className="w-20 h-8 bg-muted/30 rounded-lg" />
+              </div>
+            </div>
+            <div className="space-y-3 pt-4">
+              <div className="w-1/3 h-3 bg-muted/20 rounded-md" />
+              <div className="w-full h-8 bg-muted/10 rounded-xl" />
             </div>
           </div>
         </div>

@@ -10,9 +10,9 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 | :---------------------------- | :-------------: | :---------: | :----------: | :-------------: |
 | **Sprint 1: Foundation**      |       54        |     54      |    100.0%    |    Completed    |
 | **Sprint 2: Core Engine**     |       32        |     32      |    100.0%    |    Completed    |
-| **Sprint 3: Polish & Admin**  |       22        |     34      |    64.7%     |   In Progress   |
+| **Sprint 3: Polish & Admin**  |       32        |     32      |    100.0%    |    Completed    |
 | **Sprint 4: Differentiation** |        0        |     33      |     0.0%     |   Not Started   |
-| **Total Project**             |     **108**     |   **153**   |  **70.6%**   | **In Progress** |
+| **Total Project**             |     **118**     |   **151**   |  **78.1%**   | **In Progress** |
 
 ---
 
@@ -188,7 +188,7 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 - [x] **Create category progress bar chart** (using Recharts) — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/page.tsx>)
 - [x] **Create activity heatmap component** (GitHub-style calendar graph) — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/page.tsx>)
 - [x] **Create recent submissions widget** — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/page.tsx>)
-- [ ] **Create daily challenge card**
+- [x] **Create daily challenge card** — Implemented card component in [dashboard/page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/dashboard/page.tsx>) and `/api/problems/daily` API route.
 
 #### Day 23–24: Submission History
 
@@ -215,15 +215,15 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 #### Day 28–30: UI Polish
 
-- [ ] **Add skeleton loaders** for all data-fetching views
-- [ ] **Add toast notifications** for all success/error feedback
-- [ ] **Add empty states** for listings (no problems, no submissions)
-- [ ] **Add confirm dialogs** for destructive actions
-- [ ] **Add responsive mobile navigation** (sidebar → bottom bar)
-- [ ] **Add button loading/disabled states** during operations
-- [ ] **Add optimistic UI updates** for submission actions
-- [ ] **Review accessibility** (keyboard navigation, ARIA labels)
-- [ ] **Configure route SEO metadata** (title, description)
+- [x] **Add skeleton loaders** for all data-fetching views
+- [x] **Add toast notifications** for all success/error feedback
+- [x] **Add empty states** for listings (no problems, no submissions)
+- [x] **Add confirm dialogs** for destructive actions
+- [x] **Add responsive mobile navigation** (sidebar → bottom bar)
+- [x] **Add button loading/disabled states** during operations
+- [x] **Add optimistic UI updates** for submission actions
+- [x] **Review accessibility** (keyboard navigation, ARIA labels)
+- [x] **Configure route SEO metadata** (title, description)
 
 ---
 

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
+import type { Problem } from '@interviewprep/shared-types';
 
 // ============================================================
 // Types
@@ -79,6 +80,16 @@ export default function DashboardPage() {
   const { data, isLoading, error } = useQuery<DashboardSummaryData>({
     queryKey: ['dashboardSummary'],
     queryFn: () => apiFetch<DashboardSummaryData>('/api/dashboard/summary'),
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch Daily Challenge problem
+  const { data: dailyChallenge, isLoading: isDailyLoading } = useQuery<{
+    success: boolean;
+    data: Problem;
+  }>({
+    queryKey: ['dailyChallenge'],
+    queryFn: () => apiFetch<{ success: boolean; data: Problem }>('/api/problems/daily'),
     refetchOnWindowFocus: false,
   });
 
@@ -377,6 +388,86 @@ export default function DashboardPage() {
 
         {/* Right Side: Heatmap Calendar & Recent Submissions */}
         <div className="space-y-6">
+          {/* Daily Challenge Card */}
+          {isDailyLoading ? (
+            <Card className="border-border bg-card/30 backdrop-blur-sm relative overflow-hidden">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="h-5 w-28 bg-muted rounded-full animate-pulse" />
+                  <div className="h-5 w-16 bg-muted rounded-full animate-pulse" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-6 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-5/6 bg-muted rounded animate-pulse" />
+                </div>
+                <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                <div className="pt-4 flex items-center justify-between border-t border-border/40">
+                  <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                  <div className="h-8 w-24 bg-muted rounded-xl animate-pulse" />
+                </div>
+              </CardContent>
+            </Card>
+          ) : dailyChallenge?.data ? (
+            <Card className="border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 to-violet-500/5 backdrop-blur-md relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-300 shadow-lg shadow-indigo-500/5">
+              <div className="absolute top-0 right-0 -mr-6 -mt-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-bold tracking-wider uppercase border border-indigo-500/20 animate-pulse">
+                    <Sparkles size={10} className="stroke-[2.5]" />
+                    Daily Challenge
+                  </span>
+                  <DifficultyBadge difficulty={dailyChallenge.data.difficulty} />
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold text-foreground tracking-tight group-hover:text-indigo-400 transition-colors">
+                    {dailyChallenge.data.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {dailyChallenge.data.description.replace(/[#*`]/g, '')}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle2 size={12} className="text-emerald-500" />
+                    <span>{dailyChallenge.data.solvedCount} Solved</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Activity size={12} className="text-indigo-500" />
+                    <span>
+                      {dailyChallenge.data.attemptCount > 0
+                        ? Math.round(
+                            (dailyChallenge.data.solvedCount / dailyChallenge.data.attemptCount) *
+                              100,
+                          )
+                        : 0}
+                      % Acc
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center justify-between border-t border-border/40">
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                    <Flame size={14} className="text-orange-500 animate-pulse fill-orange-500" />
+                    <span>Solve to extend your streak!</span>
+                  </div>
+                  <Link
+                    href={`/problems/${dailyChallenge.data.slug}`}
+                    className={cn(
+                      buttonVariants({ size: 'sm', variant: 'default' }),
+                      'bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md active:scale-95 transition-all flex items-center gap-1.5',
+                    )}
+                  >
+                    Solve Challenge
+                    <PlayCircle size={12} />
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
+
           {/* Submission Heatmap */}
           <Card className="border-border bg-card/30 backdrop-blur-sm">
             <CardHeader>

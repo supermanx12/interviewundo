@@ -212,4 +212,36 @@ export class PrismaProblemRepository implements IProblemRepository {
   async countAll(): Promise<number> {
     return prisma.problem.count();
   }
+
+  async getDailyChallenge(date: Date): Promise<Problem | null> {
+    const dateOnly = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dailyChallenge = await prisma.dailyChallenge.findUnique({
+      where: { date: dateOnly },
+    });
+
+    if (!dailyChallenge) return null;
+
+    return this.findById(dailyChallenge.problemId);
+  }
+
+  async setDailyChallenge(problemId: string, date: Date): Promise<Problem> {
+    const dateOnly = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
+    await prisma.dailyChallenge.upsert({
+      where: { date: dateOnly },
+      create: {
+        problemId,
+        date: dateOnly,
+      },
+      update: {
+        problemId,
+      },
+    });
+
+    const problem = await this.findById(problemId);
+    if (!problem) {
+      throw new Error(`Problem not found: ${problemId}`);
+    }
+    return problem;
+  }
 }

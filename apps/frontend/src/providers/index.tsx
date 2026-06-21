@@ -5,13 +5,16 @@ import { AuthProvider } from './AuthProvider';
 import { QueryProvider } from './QueryProvider';
 import { ThemeProvider } from './ThemeProvider';
 import { SocketProvider } from './SocketProvider';
+import { ToastProvider } from './ToastProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <QueryProvider>
         <AuthProvider>
-          <SocketProvider>{children}</SocketProvider>
+          <ToastProvider>
+            <SocketProvider>{children}</SocketProvider>
+          </ToastProvider>
         </AuthProvider>
       </QueryProvider>
     </ThemeProvider>
@@ -20,3 +23,4 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 export { useAuth } from './AuthProvider';
 export { useSocket } from './SocketProvider';
+export { useToast } from './ToastProvider';

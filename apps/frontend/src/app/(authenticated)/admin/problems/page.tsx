@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/providers';
+import { useAuth, useToast } from '@/providers';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,12 +67,15 @@ interface TestCase {
 
 export default function AdminProblemsPage() {
   const { apiFetch } = useAuth();
+  const { success: showSuccess, error: showError } = useToast();
   const queryClient = useQueryClient();
 
   // ------------------------------------------------------------
   // Table Filters State
   // ------------------------------------------------------------
   const [search, setSearch] = useState('');
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState<
     'ALL' | 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT'
@@ -217,7 +220,13 @@ export default function AdminProblemsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminProblems'] });
+      showSuccess(
+        activeProblem ? 'Problem updated successfully!' : 'Problem created successfully!',
+      );
       setIsFormOpen(false);
+    },
+    onError: (err: any) => {
+      showError(err.message || 'Failed to save problem.');
     },
   });
 
@@ -229,7 +238,28 @@ export default function AdminProblemsPage() {
         body: JSON.stringify({ isPublished }),
       });
     },
-    onSuccess: () => {
+    onMutate: async ({ id, isPublished }) => {
+      await queryClient.cancelQueries({ queryKey: ['adminProblems'] });
+      const previousProblems = queryClient.getQueryData(['adminProblems']);
+      queryClient.setQueryData(['adminProblems'], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.map((p: any) => (p.id === id ? { ...p, isPublished } : p)),
+        };
+      });
+      return { previousProblems };
+    },
+    onSuccess: (_, variables) => {
+      showSuccess(variables.isPublished ? 'Problem published live!' : 'Problem reverted to draft.');
+    },
+    onError: (err: any, _, context: any) => {
+      if (context?.previousProblems) {
+        queryClient.setQueryData(['adminProblems'], context.previousProblems);
+      }
+      showError(err.message || 'Failed to update problem status.');
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adminProblems'] });
     },
   });
@@ -243,16 +273,23 @@ export default function AdminProblemsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminProblems'] });
+      showSuccess('Problem deleted successfully.');
+    },
+    onError: (err: any) => {
+      showError(err.message || 'Failed to delete problem.');
     },
   });
 
   const handleDeleteProblem = (id: string) => {
-    if (
-      confirm(
-        'Are you absolutely sure you want to delete this problem? This will permanently erase it and all its associated test cases.',
-      )
-    ) {
-      deleteProblemMutation.mutate(id);
+    setDeleteTargetId(id);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteProblem = () => {
+    if (deleteTargetId) {
+      deleteProblemMutation.mutate(deleteTargetId);
+      setIsDeleteConfirmOpen(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -304,10 +341,14 @@ export default function AdminProblemsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testCases', testCaseProblem?.id] });
+      showSuccess('Test case added successfully.');
       setTcInput('');
       setTcExpectedOutput('');
       setTcIsHidden(false);
       setTcOrder(0);
+    },
+    onError: (err: any) => {
+      showError(err.message || 'Failed to add test case.');
     },
   });
 
@@ -320,6 +361,10 @@ export default function AdminProblemsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testCases', testCaseProblem?.id] });
+      showSuccess('Test case deleted successfully.');
+    },
+    onError: (err: any) => {
+      showError(err.message || 'Failed to delete test case.');
     },
   });
 
@@ -542,6 +587,7 @@ export default function AdminProblemsPage() {
                           size="icon-sm"
                           variant="ghost"
                           title="Manage Test Cases"
+                          aria-label="Manage Test Cases"
                           onClick={() => handleOpenTestCases(problem)}
                           className="rounded-lg text-amber-500 hover:bg-amber-500/10 hover:text-amber-500 active:scale-95"
                         >
@@ -553,6 +599,7 @@ export default function AdminProblemsPage() {
                           size="icon-sm"
                           variant="ghost"
                           title="Edit Details"
+                          aria-label="Edit problem details"
                           onClick={() => handleOpenEditModal(problem)}
                           className="rounded-lg text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-500 active:scale-95"
                         >
@@ -564,6 +611,7 @@ export default function AdminProblemsPage() {
                           size="icon-sm"
                           variant="ghost"
                           title="Delete Problem"
+                          aria-label="Delete problem"
                           onClick={() => handleDeleteProblem(problem.id)}
                           className="rounded-lg text-rose-500 hover:bg-rose-500/10 hover:text-rose-500 active:scale-95"
                         >
@@ -850,6 +898,7 @@ export default function AdminProblemsPage() {
                             <Button
                               size="icon-sm"
                               variant="ghost"
+                              aria-label="Delete test case"
                               onClick={() => deleteTestCaseMutation.mutate(tc.id)}
                               className="text-rose-500 hover:bg-rose-500/10 rounded-md active:scale-95"
                             >
@@ -947,6 +996,39 @@ export default function AdminProblemsPage() {
               className="rounded-xl h-10 px-6 font-semibold active:scale-95"
             >
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ------------------------------------------------------------
+          DIALOG: DELETE CONFIRMATION
+          ------------------------------------------------------------ */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent className="max-w-md p-6 bg-card border-border rounded-2xl shadow-xl">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-rose-500">
+              Confirm Problem Deletion
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground pt-1 leading-relaxed">
+              Are you absolutely sure you want to delete this problem? This will permanently erase
+              it, all associated test cases, and user submissions history. This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6 flex flex-row justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteConfirmOpen(false)}
+              className="rounded-xl h-10 px-5 text-xs font-semibold active:scale-95 border-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmDeleteProblem}
+              className="rounded-xl h-10 px-6 text-xs bg-rose-600 hover:bg-rose-500 text-white font-semibold active:scale-95"
+            >
+              Delete Permanently
             </Button>
           </DialogFooter>
         </DialogContent>

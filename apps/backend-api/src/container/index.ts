@@ -22,6 +22,7 @@ import { LoginUser } from '../application/use-cases/auth/LoginUser';
 import { RefreshToken } from '../application/use-cases/auth/RefreshToken';
 import { GetProblems } from '../application/use-cases/problem/GetProblems';
 import { GetProblemBySlug } from '../application/use-cases/problem/GetProblemBySlug';
+import { GetDailyChallenge } from '../application/use-cases/problem/GetDailyChallenge';
 import { SubmitSolution } from '../application/use-cases/submission/SubmitSolution';
 import { RunCode } from '../application/use-cases/submission/RunCode';
 import { GetSubmissions } from '../application/use-cases/submission/GetSubmissions';
@@ -72,6 +73,7 @@ const loginUser = new LoginUser(userRepository, passwordService, authTokenServic
 const refreshToken = new RefreshToken(userRepository, authTokenService);
 const getProblems = new GetProblems(problemRepository, cacheService);
 const getProblemBySlug = new GetProblemBySlug(problemRepository, cacheService);
+const getDailyChallenge = new GetDailyChallenge(problemRepository, cacheService);
 const submitSolution = new SubmitSolution(
   submissionRepository,
   problemRepository,
@@ -99,7 +101,7 @@ const getTestCasesByProblemId = new GetTestCasesByProblemId(testCaseRepository);
 
 // Step 3: Instantiate controllers
 const authController = new AuthController(registerUser, loginUser, refreshToken);
-const problemController = new ProblemController(getProblems, getProblemBySlug);
+const problemController = new ProblemController(getProblems, getProblemBySlug, getDailyChallenge);
 const submissionController = new SubmissionController(
   submitSolution,
   runCode,
@@ -143,6 +145,7 @@ export const container = {
     refreshToken,
     getProblems,
     getProblemBySlug,
+    getDailyChallenge,
     submitSolution,
     runCode,
     getSubmissions,
