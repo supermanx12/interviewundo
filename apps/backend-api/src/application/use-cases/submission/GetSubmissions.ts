@@ -1,15 +1,30 @@
 import type { IUseCase } from '../../interfaces/IUseCase';
 import type { ISubmissionRepository } from '../../../domain/ports/repositories/ISubmissionRepository';
-import type { Submission } from '@interviewprep/shared-types';
+import type { Submission, SubmissionResult } from '@interviewprep/shared-types';
+
+// ============================================================
+// GetSubmissions Use Case
+// Returns paginated submissions with filtering by problemId
+// ============================================================
 
 export interface GetSubmissionsInput {
   userId: string;
+  problemId?: string;
   page?: number;
   limit?: number;
 }
 
 export interface GetSubmissionsOutput {
-  data: Submission[];
+  data: Array<
+    Submission & {
+      problem?: {
+        title: string;
+        slug: string;
+        difficulty: string;
+      };
+      result?: SubmissionResult | null;
+    }
+  >;
   total: number;
   page: number;
   limit: number;
@@ -26,6 +41,7 @@ export class GetSubmissions implements IUseCase<GetSubmissionsInput, GetSubmissi
     const { data, total } = await this.submissionRepository.findByUser(input.userId, {
       page,
       limit,
+      problemId: input.problemId,
     });
 
     return {

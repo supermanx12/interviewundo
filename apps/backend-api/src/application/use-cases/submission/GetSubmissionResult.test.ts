@@ -39,6 +39,10 @@ describe('GetSubmissionResult Use Case', () => {
       createResult: vi.fn(),
       countByUser: vi.fn(),
       countSolvedByUser: vi.fn(),
+      countAcceptedByUser: vi.fn(),
+      getSolvedProblemsDifficultyByUser: vi.fn(),
+      getSolvedProblemsCategoryByUser: vi.fn(),
+      getRecentActivityByUser: vi.fn(),
       getActivityByUser: vi.fn(),
     };
 

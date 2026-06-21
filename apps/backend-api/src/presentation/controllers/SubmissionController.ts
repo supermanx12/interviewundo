@@ -69,11 +69,13 @@ export class SubmissionController {
 
       const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
+      const problemId = req.query.problemId as string | undefined;
 
       const result = await this.getSubmissions.execute({
         userId,
         page,
         limit,
+        problemId,
       });
 
       res.status(200).json({

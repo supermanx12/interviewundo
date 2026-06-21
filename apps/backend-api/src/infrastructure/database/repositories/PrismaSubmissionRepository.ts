@@ -50,16 +50,38 @@ export class PrismaSubmissionRepository implements ISubmissionRepository {
     return this.mapPrismaSubmission(prismaSubmission);
   }
 
-  async findById(id: string): Promise<(Submission & { result?: SubmissionResult | null }) | null> {
+  async findById(id: string): Promise<
+    | (Submission & {
+        problem?: {
+          title: string;
+          slug: string;
+          difficulty: string;
+          description: string;
+        };
+        result?: SubmissionResult | null;
+      })
+    | null
+  > {
     const prismaSubmission = await prisma.submission.findUnique({
       where: { id },
-      include: { result: true },
+      include: {
+        result: true,
+        problem: {
+          select: {
+            title: true,
+            slug: true,
+            difficulty: true,
+            description: true,
+          },
+        },
+      },
     });
 
     if (!prismaSubmission) return null;
 
     return {
       ...this.mapPrismaSubmission(prismaSubmission),
+      problem: prismaSubmission.problem,
       result: prismaSubmission.result
         ? this.mapPrismaSubmissionResult(prismaSubmission.result)
         : null,
@@ -68,26 +90,57 @@ export class PrismaSubmissionRepository implements ISubmissionRepository {
 
   async findByUser(
     userId: string,
-    options?: { page?: number; limit?: number },
-  ): Promise<{ data: Submission[]; total: number }> {
+    options?: { page?: number; limit?: number; problemId?: string },
+  ): Promise<{
+    data: Array<
+      Submission & {
+        problem?: {
+          title: string;
+          slug: string;
+          difficulty: string;
+        };
+        result?: SubmissionResult | null;
+      }
+    >;
+    total: number;
+  }> {
     const page = options?.page || 1;
     const limit = options?.limit || 20;
     const skip = (page - 1) * limit;
 
+    const where: any = { userId };
+    if (options?.problemId) {
+      where.problemId = options.problemId;
+    }
+
     const [submissions, total] = await Promise.all([
       prisma.submission.findMany({
-        where: { userId },
+        where,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        include: {
+          problem: {
+            select: {
+              title: true,
+              slug: true,
+              difficulty: true,
+            },
+          },
+          result: true,
+        },
       }),
       prisma.submission.count({
-        where: { userId },
+        where,
       }),
     ]);
 
     return {
-      data: submissions.map((s: any) => this.mapPrismaSubmission(s)),
+      data: submissions.map((s: any) => ({
+        ...this.mapPrismaSubmission(s),
+        problem: s.problem,
+        result: s.result ? this.mapPrismaSubmissionResult(s.result) : null,
+      })),
       total,
     };
   }

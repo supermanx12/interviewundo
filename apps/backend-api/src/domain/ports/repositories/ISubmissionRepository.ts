@@ -13,12 +13,35 @@ export interface ISubmissionRepository {
     status: string;
   }): Promise<Submission>;
 
-  findById(id: string): Promise<(Submission & { result?: SubmissionResult | null }) | null>;
+  findById(id: string): Promise<
+    | (Submission & {
+        problem?: {
+          title: string;
+          slug: string;
+          difficulty: string;
+          description: string;
+        };
+        result?: SubmissionResult | null;
+      })
+    | null
+  >;
 
   findByUser(
     userId: string,
-    options?: { page?: number; limit?: number },
-  ): Promise<{ data: Submission[]; total: number }>;
+    options?: { page?: number; limit?: number; problemId?: string },
+  ): Promise<{
+    data: Array<
+      Submission & {
+        problem?: {
+          title: string;
+          slug: string;
+          difficulty: string;
+        };
+        result?: SubmissionResult | null;
+      }
+    >;
+    total: number;
+  }>;
 
   findByUserAndProblem(userId: string, problemId: string): Promise<Submission[]>;
 

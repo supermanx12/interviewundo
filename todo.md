@@ -10,9 +10,9 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 | :---------------------------- | :-------------: | :---------: | :----------: | :-------------: |
 | **Sprint 1: Foundation**      |       54        |     54      |    100.0%    |    Completed    |
 | **Sprint 2: Core Engine**     |       32        |     32      |    100.0%    |    Completed    |
-| **Sprint 3: Polish & Admin**  |        9        |     34      |    26.5%     |   In Progress   |
+| **Sprint 3: Polish & Admin**  |       14        |     34      |    41.2%     |   In Progress   |
 | **Sprint 4: Differentiation** |        0        |     33      |     0.0%     |   Not Started   |
-| **Total Project**             |     **95**      |   **153**   |  **62.1%**   | **In Progress** |
+| **Total Project**             |     **100**     |   **153**   |  **65.4%**   | **In Progress** |
 
 ---
 
@@ -192,11 +192,11 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 #### Day 23–24: Submission History
 
-- [ ] **Create submission history page** (with pagination)
-- [ ] **Create submission detail view** (code, status, test cases detail)
-- [ ] **Create code diff viewer** (compare two submissions)
-- [ ] **Create result badge component** (Accepted = green, WA = red, etc.)
-- [ ] **Add "View previous submissions" link** on problem workspace
+- [x] **Create submission history page** (with pagination) — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/submissions/page.tsx>)
+- [x] **Create submission detail view** (code, status, test cases detail) — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/submissions/page.tsx>)
+- [x] **Create code diff viewer** (compare two submissions) — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/submissions/page.tsx>)
+- [x] **Create result badge component** (Accepted = green, WA = red, etc.) — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/submissions/page.tsx>)
+- [x] **Add "View previous submissions" link** on problem workspace — Implemented in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/problems/[slug]/page.tsx>)
 
 ---
 

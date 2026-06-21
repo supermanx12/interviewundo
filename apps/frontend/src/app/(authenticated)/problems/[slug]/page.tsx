@@ -9,6 +9,7 @@ import { useAuth, useSocket } from '@/providers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DifficultyBadge } from '@/components/ui/difficulty-badge';
+import Link from 'next/link';
 import {
   Loader2,
   ChevronLeft,
@@ -21,6 +22,7 @@ import {
   Settings,
   HelpCircle,
   FileCode,
+  History,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -375,9 +377,18 @@ export default function ProblemWorkspacePage() {
             mobileTab === 'description' ? 'flex' : 'hidden md:flex',
           )}
         >
-          <div className="flex items-center gap-1.5 px-6 py-3 border-b border-border bg-muted/20 shrink-0 text-xs font-semibold text-muted-foreground select-none">
-            <BookOpen size={13} />
-            Problem Description
+          <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20 shrink-0 text-xs font-semibold text-muted-foreground select-none">
+            <div className="flex items-center gap-1.5">
+              <BookOpen size={13} />
+              Problem Description
+            </div>
+            <Link
+              href="/submissions"
+              className="text-xs text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold flex items-center gap-1 active:scale-95 transition-all"
+            >
+              <History size={12} />
+              Submissions History
+            </Link>
           </div>
 
           <div className="flex-1 overflow-y-auto px-6 py-5 prose prose-indigo dark:prose-invert max-w-none scrollbar-thin">

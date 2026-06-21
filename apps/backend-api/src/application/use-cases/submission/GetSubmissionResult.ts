@@ -9,6 +9,12 @@ export interface GetSubmissionResultInput {
 }
 
 export type GetSubmissionResultOutput = Submission & {
+  problem?: {
+    title: string;
+    slug: string;
+    difficulty: string;
+    description: string;
+  };
   result?: SubmissionResult | null;
 };
 

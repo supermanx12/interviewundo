@@ -7,7 +7,7 @@ async function setMonacoValue(page: any, value: string) {
   // Wait for model initialization
   await page.waitForFunction(() => (window as any).monaco?.editor?.getModels()?.length > 0);
   // Set value directly in the model
-  await page.evaluate((val) => {
+  await page.evaluate((val: string) => {
     (window as any).monaco.editor.getModels()[0].setValue(val);
   }, value);
 }
