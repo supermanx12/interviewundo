@@ -11,8 +11,8 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 | **Sprint 1: Foundation**      |       54        |     54      |    100.0%    |    Completed    |
 | **Sprint 2: Core Engine**     |       32        |     32      |    100.0%    |    Completed    |
 | **Sprint 3: Polish & Admin**  |       32        |     32      |    100.0%    |    Completed    |
-| **Sprint 4: Differentiation** |        6        |     33      |    18.2%     |   In Progress   |
-| **Total Project**             |     **124**     |   **151**   |  **82.1%**   | **In Progress** |
+| **Sprint 4: Differentiation** |       16        |     33      |    48.5%     |   In Progress   |
+| **Total Project**             |     **134**     |   **151**   |  **88.7%**   | **In Progress** |
 
 ---
 
@@ -244,19 +244,19 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 #### Day 33–34: AI-Powered Hints
 
-- [ ] **Create OpenAIHintService** in infrastructure layer
-- [ ] **Create GetHintForProblem use case**
-- [ ] **Create hint API endpoint** (`POST /api/problems/:slug/hint`)
-- [ ] **Rate limit hints** to 3 per problem/user/day
-- [ ] **Design LLM prompt template** (conceptual hint, NO code, max 2 sentences)
-- [ ] **Create hint UI widget** (collapsible, "Get Hint" button)
-- [ ] **Track hint usage in database**
-- [ ] **Add hint loading animation**
+- [x] **Create OpenAIHintService** in infrastructure layer — Implemented as `GrokHintService` in [GrokHintService.ts](file:///d:/interview-prep-platform/apps/backend-api/src/infrastructure/ai/GrokHintService.ts) using xAI's API.
+- [x] **Create GetHintForProblem use case** — Built orchestration and limits checks in [GetHintForProblem.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/problem/GetHintForProblem.ts).
+- [x] **Create hint API endpoint** (`POST /api/problems/:slug/hint`) — Exposed in [problem.routes.ts](file:///d:/interview-prep-platform/apps/backend-api/src/presentation/routes/problem.routes.ts).
+- [x] **Rate limit hints** to 3 per problem/user/day — Enforced using the `HintUsage` table and counts check.
+- [x] **Design LLM prompt template** (conceptual hint, NO code, max 2 sentences) — Built template in the xAI Grok API call payload.
+- [x] **Create hint UI widget** (collapsible, "Get Hint" button) — Designed premium widget in [page.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(authenticated)/problems/[slug]/page.tsx>).
+- [x] **Track hint usage in database** — Defined in [schema.prisma](file:///d:/interview-prep-platform/apps/backend-api/src/infrastructure/database/prisma/schema.prisma) and stored via [PrismaHintUsageRepository.ts](file:///d:/interview-prep-platform/apps/backend-api/src/infrastructure/database/repositories/PrismaHintUsageRepository.ts).
+- [x] **Add hint loading animation** — Added Loader2 spinners and disabled button transitions during generation states.
 
 #### Day 35: Daily Challenge & Streaks
 
-- [ ] **Create cron job to rotate daily challenge**
-- [ ] **Create GetDailyChallenge use case**
+- [x] **Create cron job to rotate daily challenge**
+- [x] **Create GetDailyChallenge use case**
 - [ ] **Create daily challenge banner** on dashboard
 - [ ] **Implement streak calculation logic**
 - [ ] **Show streak counter in header**

@@ -27,6 +27,10 @@ const envSchema = z.object({
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(900000), // 15 minutes
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
+
+  // Grok API (xAI)
+  GROK_API_KEY: z.string().optional(),
+  GROK_MODEL: z.string().default('grok-2'),
 });
 
 export type Env = z.infer<typeof envSchema>;

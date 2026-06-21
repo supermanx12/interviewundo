@@ -57,6 +57,7 @@ model User {
   updatedAt    DateTime     @updatedAt
 
   submissions Submission[]
+  hintUsages  HintUsage[]
 
   @@index([email])
   @@index([githubId])
@@ -82,6 +83,7 @@ model Problem {
 
   testCases   TestCase[]
   submissions Submission[]
+  hintUsages  HintUsage[]
 
   @@index([slug])
   @@index([category, difficulty])
@@ -147,4 +149,17 @@ model DailyChallenge {
 
   @@index([date])
   @@map("daily_challenges")
+}
+
+model HintUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  problemId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@index([userId, problemId, createdAt])
+  @@map("hint_usages")
 }

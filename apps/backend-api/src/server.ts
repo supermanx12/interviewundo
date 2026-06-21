@@ -6,6 +6,7 @@ import { redis, redisSubscriber } from './config/redis';
 import { Server as SocketIOServer } from 'socket.io';
 import { socketIOService } from './infrastructure/notification/SocketIOService';
 import { container } from './container';
+import { DailyChallengeCron } from './infrastructure/cron/DailyChallengeCron';
 
 // ============================================================
 // Server Entry Point — With Graceful Shutdown
@@ -26,6 +27,9 @@ const io = new SocketIOServer(server, {
 });
 
 socketIOService.initialize(io, container.services.authTokenService);
+
+// --- Initialize Cron Jobs ---
+DailyChallengeCron.start();
 
 // --- Graceful Shutdown ---
 async function gracefulShutdown(signal: string) {

@@ -9,6 +9,8 @@ import { PrismaUserRepository } from '../infrastructure/database/repositories/Pr
 import { PrismaProblemRepository } from '../infrastructure/database/repositories/PrismaProblemRepository';
 import { PrismaSubmissionRepository } from '../infrastructure/database/repositories/PrismaSubmissionRepository';
 import { PrismaTestCaseRepository } from '../infrastructure/database/repositories/PrismaTestCaseRepository';
+import { PrismaHintUsageRepository } from '../infrastructure/database/repositories/PrismaHintUsageRepository';
+import { GrokHintService } from '../infrastructure/ai/GrokHintService';
 import { JoseAuthTokenService } from '../infrastructure/auth/JoseAuthTokenService';
 import { Argon2PasswordService } from '../infrastructure/auth/Argon2PasswordService';
 import { RedisCacheService } from '../infrastructure/cache/RedisCacheService';
@@ -24,6 +26,7 @@ import { AuthenticateGithubUser } from '../application/use-cases/auth/Authentica
 import { GetProblems } from '../application/use-cases/problem/GetProblems';
 import { GetProblemBySlug } from '../application/use-cases/problem/GetProblemBySlug';
 import { GetDailyChallenge } from '../application/use-cases/problem/GetDailyChallenge';
+import { GetHintForProblem } from '../application/use-cases/problem/GetHintForProblem';
 import { SubmitSolution } from '../application/use-cases/submission/SubmitSolution';
 import { RunCode } from '../application/use-cases/submission/RunCode';
 import { GetSubmissions } from '../application/use-cases/submission/GetSubmissions';
@@ -64,6 +67,8 @@ const authTokenService = new JoseAuthTokenService();
 const passwordService = new Argon2PasswordService();
 const cacheService = new RedisCacheService();
 const queueService = new BullMQQueueService(submissionQueue);
+const hintUsageRepository = new PrismaHintUsageRepository();
+const hintService = new GrokHintService();
 
 // Use real SocketIOService as the notification service
 const notificationService = socketIOService;
@@ -76,6 +81,11 @@ const authenticateGithubUser = new AuthenticateGithubUser(userRepository, authTo
 const getProblems = new GetProblems(problemRepository, cacheService);
 const getProblemBySlug = new GetProblemBySlug(problemRepository, cacheService);
 const getDailyChallenge = new GetDailyChallenge(problemRepository, cacheService);
+const getHintForProblem = new GetHintForProblem(
+  problemRepository,
+  hintUsageRepository,
+  hintService,
+);
 const submitSolution = new SubmitSolution(
   submissionRepository,
   problemRepository,
@@ -108,7 +118,12 @@ const authController = new AuthController(
   refreshToken,
   authenticateGithubUser,
 );
-const problemController = new ProblemController(getProblems, getProblemBySlug, getDailyChallenge);
+const problemController = new ProblemController(
+  getProblems,
+  getProblemBySlug,
+  getDailyChallenge,
+  getHintForProblem,
+);
 const submissionController = new SubmissionController(
   submitSolution,
   runCode,
@@ -140,6 +155,7 @@ export const container = {
     problemRepository,
     submissionRepository,
     testCaseRepository,
+    hintUsageRepository,
   },
   services: {
     authTokenService,
@@ -154,6 +170,7 @@ export const container = {
     getProblems,
     getProblemBySlug,
     getDailyChallenge,
+    getHintForProblem,
     submitSolution,
     runCode,
     getSubmissions,

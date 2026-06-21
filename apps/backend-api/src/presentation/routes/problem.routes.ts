@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { container } from '../../container';
 import { validateRequest } from '../middleware/validate-request';
+import { authenticate } from '../middleware/authenticate';
 import { ProblemFilterSchema } from '@interviewprep/shared-types';
 
 const problemRoutes = Router();
@@ -13,6 +14,11 @@ problemRoutes.get('/', validateRequest(ProblemFilterSchema, 'query'), (req, res,
 // GET /api/problems/daily
 problemRoutes.get('/daily', (req, res, next) => {
   container.controllers.problemController.getDaily(req, res, next);
+});
+
+// POST /api/problems/:slug/hint
+problemRoutes.post('/:slug/hint', authenticate, (req, res, next) => {
+  container.controllers.problemController.getHint(req, res, next);
 });
 
 // GET /api/problems/:slug
