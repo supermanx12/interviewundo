@@ -1,14 +1,30 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 // Helper to set Monaco Editor value
-async function setMonacoValue(page: any, value: string) {
+async function setMonacoValue(page: Page, value: string) {
   // Wait for Monaco to load
   await page.waitForSelector('.monaco-editor');
   // Wait for model initialization
-  await page.waitForFunction(() => (window as any).monaco?.editor?.getModels()?.length > 0);
+  await page.waitForFunction(() => {
+    const monacoWindow = window as Window & {
+      monaco?: {
+        editor?: {
+          getModels: () => Array<{ setValue: (value: string) => void }>;
+        };
+      };
+    };
+    return (monacoWindow.monaco?.editor?.getModels()?.length ?? 0) > 0;
+  });
   // Set value directly in the model
   await page.evaluate((val: string) => {
-    (window as any).monaco.editor.getModels()[0].setValue(val);
+    const monacoWindow = window as Window & {
+      monaco?: {
+        editor?: {
+          getModels: () => Array<{ setValue: (value: string) => void }>;
+        };
+      };
+    };
+    monacoWindow.monaco?.editor?.getModels()[0]?.setValue(val);
   }, value);
 }
 
