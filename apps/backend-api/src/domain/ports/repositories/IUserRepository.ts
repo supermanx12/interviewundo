@@ -6,7 +6,14 @@ import type { User } from '@interviewprep/shared-types';
 // ============================================================
 
 export interface IUserRepository {
-  create(data: { name: string; email: string; password: string; role: string }): Promise<User>;
+  create(data: {
+    name: string;
+    email: string;
+    password?: string | null;
+    role: string;
+    githubId?: string | null;
+    image?: string | null;
+  }): Promise<User>;
 
   findById(id: string): Promise<User | null>;
 
@@ -15,6 +22,11 @@ export interface IUserRepository {
   findByGithubId(githubId: string): Promise<User | null>;
 
   updateStreak(userId: string, streak: number, lastActiveAt: Date): Promise<void>;
+
+  update(
+    id: string,
+    data: { name?: string; image?: string | null; githubId?: string | null },
+  ): Promise<User>;
 
   count(): Promise<number>;
 }

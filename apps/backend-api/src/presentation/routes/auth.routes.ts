@@ -15,28 +15,27 @@ const RefreshTokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
-authRoutes.post(
-  '/register',
-  validateRequest(RegisterSchema),
-  (req, res, next) => {
-    container.controllers.authController.register(req, res, next);
-  }
-);
+authRoutes.post('/register', validateRequest(RegisterSchema), (req, res, next) => {
+  container.controllers.authController.register(req, res, next);
+});
 
-authRoutes.post(
-  '/login',
-  validateRequest(LoginSchema),
-  (req, res, next) => {
-    container.controllers.authController.login(req, res, next);
-  }
-);
+authRoutes.post('/login', validateRequest(LoginSchema), (req, res, next) => {
+  container.controllers.authController.login(req, res, next);
+});
 
-authRoutes.post(
-  '/refreshToken',
-  validateRequest(RefreshTokenSchema),
-  (req, res, next) => {
-    container.controllers.authController.refresh(req, res, next);
-  }
-);
+authRoutes.post('/refreshToken', validateRequest(RefreshTokenSchema), (req, res, next) => {
+  container.controllers.authController.refresh(req, res, next);
+});
+
+const GithubAuthSchema = z.object({
+  githubId: z.string().min(1, 'Github ID is required'),
+  email: z.string().email('Invalid email address'),
+  name: z.string().min(1, 'Name is required'),
+  image: z.string().nullable().optional(),
+});
+
+authRoutes.post('/github', validateRequest(GithubAuthSchema), (req, res, next) => {
+  container.controllers.authController.githubLogin(req, res, next);
+});
 
 export { authRoutes };

@@ -20,6 +20,7 @@ import { socketIOService } from '../infrastructure/notification/SocketIOService'
 import { RegisterUser } from '../application/use-cases/auth/RegisterUser';
 import { LoginUser } from '../application/use-cases/auth/LoginUser';
 import { RefreshToken } from '../application/use-cases/auth/RefreshToken';
+import { AuthenticateGithubUser } from '../application/use-cases/auth/AuthenticateGithubUser';
 import { GetProblems } from '../application/use-cases/problem/GetProblems';
 import { GetProblemBySlug } from '../application/use-cases/problem/GetProblemBySlug';
 import { GetDailyChallenge } from '../application/use-cases/problem/GetDailyChallenge';
@@ -71,6 +72,7 @@ const notificationService = socketIOService;
 const registerUser = new RegisterUser(userRepository, passwordService, authTokenService);
 const loginUser = new LoginUser(userRepository, passwordService, authTokenService);
 const refreshToken = new RefreshToken(userRepository, authTokenService);
+const authenticateGithubUser = new AuthenticateGithubUser(userRepository, authTokenService);
 const getProblems = new GetProblems(problemRepository, cacheService);
 const getProblemBySlug = new GetProblemBySlug(problemRepository, cacheService);
 const getDailyChallenge = new GetDailyChallenge(problemRepository, cacheService);
@@ -100,7 +102,12 @@ const deleteTestCase = new DeleteTestCase(testCaseRepository);
 const getTestCasesByProblemId = new GetTestCasesByProblemId(testCaseRepository);
 
 // Step 3: Instantiate controllers
-const authController = new AuthController(registerUser, loginUser, refreshToken);
+const authController = new AuthController(
+  registerUser,
+  loginUser,
+  refreshToken,
+  authenticateGithubUser,
+);
 const problemController = new ProblemController(getProblems, getProblemBySlug, getDailyChallenge);
 const submissionController = new SubmissionController(
   submitSolution,
@@ -143,6 +150,7 @@ export const container = {
     registerUser,
     loginUser,
     refreshToken,
+    authenticateGithubUser,
     getProblems,
     getProblemBySlug,
     getDailyChallenge,

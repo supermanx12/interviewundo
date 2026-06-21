@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import type { LoginDTO, RegisterDTO, AuthResponseDTO } from '@interviewprep/shared-types';
 
 interface User {
@@ -30,61 +31,90 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const { data: session, status: sessionStatus } = useSession();
+
   const logout = useCallback(() => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-  }, []);
-
-  const refreshSession = useCallback(async (existingRefreshToken: string) => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/refreshToken`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: existingRefreshToken }),
-      });
-
-      if (!response.ok) throw new Error('Token refresh failed');
-
-      const payload = await response.json();
-      if (payload.success && payload.data) {
-        const { accessToken, refreshToken: newRefreshToken } = payload.data;
-        setToken(accessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
-        
-        // Restore user from localStorage if it's there
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-        return accessToken;
-      } else {
-        throw new Error('Invalid refresh response structure');
-      }
-    } catch (err) {
-      logout();
-      return null;
+    if (sessionStatus === 'authenticated') {
+      signOut();
     }
-  }, [logout]);
+  }, [sessionStatus]);
+
+  const refreshSession = useCallback(
+    async (existingRefreshToken: string) => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/auth/refreshToken`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken: existingRefreshToken }),
+        });
+
+        if (!response.ok) throw new Error('Token refresh failed');
+
+        const payload = await response.json();
+        if (payload.success && payload.data) {
+          const { accessToken, refreshToken: newRefreshToken } = payload.data;
+          setToken(accessToken);
+          localStorage.setItem('refreshToken', newRefreshToken);
+
+          // Restore user from localStorage if it's there
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          }
+          return accessToken;
+        } else {
+          throw new Error('Invalid refresh response structure');
+        }
+      } catch (err) {
+        logout();
+        return null;
+      }
+    },
+    [logout],
+  );
+
+  // Synchronize Next-Auth session
+  useEffect(() => {
+    if (sessionStatus === 'authenticated' && session?.accessToken && session?.user) {
+      setToken(session.accessToken);
+      setUser({
+        id: session.user.id,
+        name: session.user.name || 'GitHub User',
+        email: session.user.email || '',
+        role: session.user.role || 'STUDENT',
+        image: session.user.image,
+      });
+      setLoading(false);
+    }
+  }, [session, sessionStatus]);
 
   // Periodic silent refresh (runs every 14 minutes since JWT expiry is 15 minutes)
   useEffect(() => {
-    if (!token) return;
+    if (!token || sessionStatus === 'authenticated') return;
 
-    const interval = setInterval(async () => {
-      const rt = localStorage.getItem('refreshToken');
-      if (rt) {
-        await refreshSession(rt);
-      }
-    }, 14 * 60 * 1000);
+    const interval = setInterval(
+      async () => {
+        const rt = localStorage.getItem('refreshToken');
+        if (rt) {
+          await refreshSession(rt);
+        }
+      },
+      14 * 60 * 1000,
+    );
 
     return () => clearInterval(interval);
-  }, [token, refreshSession]);
+  }, [token, refreshSession, sessionStatus]);
 
   // Initial boot check
   useEffect(() => {
     const initializeAuth = async () => {
+      if (sessionStatus === 'loading') return;
+      if (sessionStatus === 'authenticated') return;
+
       const rt = localStorage.getItem('refreshToken');
       if (rt) {
         await refreshSession(rt);
@@ -93,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     initializeAuth();
-  }, [refreshSession]);
+  }, [refreshSession, sessionStatus]);
 
   const login = async (credentials: LoginDTO) => {
     setLoading(true);
@@ -149,42 +179,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const apiFetch = useCallback(async <T,>(path: string, options: RequestInit = {}): Promise<T> => {
-    const headers = new Headers(options.headers || {});
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
-      headers.set('Content-Type', 'application/json');
-    }
+  const apiFetch = useCallback(
+    async <T,>(path: string, options: RequestInit = {}): Promise<T> => {
+      const headers = new Headers(options.headers || {});
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+        headers.set('Content-Type', 'application/json');
+      }
 
-    let response = await fetch(`${BACKEND_URL}${path}`, {
-      ...options,
-      headers,
-    });
+      let response = await fetch(`${BACKEND_URL}${path}`, {
+        ...options,
+        headers,
+      });
 
-    // Handle token expiration / 401
-    if (response.status === 401) {
-      const rt = localStorage.getItem('refreshToken');
-      if (rt) {
-        const newAccessToken = await refreshSession(rt);
-        if (newAccessToken) {
-          headers.set('Authorization', `Bearer ${newAccessToken}`);
-          response = await fetch(`${BACKEND_URL}${path}`, {
-            ...options,
-            headers,
-          });
+      // Handle token expiration / 401
+      if (response.status === 401) {
+        const rt = localStorage.getItem('refreshToken');
+        if (rt) {
+          const newAccessToken = await refreshSession(rt);
+          if (newAccessToken) {
+            headers.set('Authorization', `Bearer ${newAccessToken}`);
+            response = await fetch(`${BACKEND_URL}${path}`, {
+              ...options,
+              headers,
+            });
+          }
         }
       }
-    }
 
-    const payload = await response.json();
-    if (!response.ok || !payload.success) {
-      throw new Error(payload.error?.message || 'API request failed');
-    }
+      const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error?.message || 'API request failed');
+      }
 
-    return payload.data as T;
-  }, [token, refreshSession]);
+      return payload.data as T;
+    },
+    [token, refreshSession],
+  );
 
   return (
     <AuthContext.Provider value={{ user, token, loading, login, register, logout, apiFetch }}>

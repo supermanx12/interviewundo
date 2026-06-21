@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { SessionProvider } from 'next-auth/react';
 import { AuthProvider } from './AuthProvider';
 import { QueryProvider } from './QueryProvider';
 import { ThemeProvider } from './ThemeProvider';
@@ -9,15 +10,17 @@ import { ToastProvider } from './ToastProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider>
-      <QueryProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <SocketProvider>{children}</SocketProvider>
-          </ToastProvider>
-        </AuthProvider>
-      </QueryProvider>
-    </ThemeProvider>
+    <SessionProvider>
+      <ThemeProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <SocketProvider>{children}</SocketProvider>
+            </ToastProvider>
+          </AuthProvider>
+        </QueryProvider>
+      </ThemeProvider>
+    </SessionProvider>
   );
 }
 

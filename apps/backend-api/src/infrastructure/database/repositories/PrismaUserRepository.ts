@@ -26,15 +26,19 @@ export class PrismaUserRepository implements IUserRepository {
   async create(data: {
     name: string;
     email: string;
-    password: string;
+    password?: string | null;
     role: string;
+    githubId?: string | null;
+    image?: string | null;
   }): Promise<User> {
     const prismaUser = await prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
-        password: data.password,
+        password: data.password || null,
         role: data.role as any,
+        githubId: data.githubId || null,
+        image: data.image || null,
       },
     });
 
@@ -80,6 +84,22 @@ export class PrismaUserRepository implements IUserRepository {
         lastActiveAt,
       },
     });
+  }
+
+  async update(
+    id: string,
+    data: { name?: string; image?: string | null; githubId?: string | null },
+  ): Promise<User> {
+    const prismaUser = await prisma.user.update({
+      where: { id },
+      data: {
+        name: data.name,
+        image: data.image,
+        githubId: data.githubId,
+      },
+    });
+
+    return this.mapPrismaUser(prismaUser);
   }
 
   async count(): Promise<number> {

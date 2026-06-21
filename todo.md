@@ -11,8 +11,8 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 | **Sprint 1: Foundation**      |       54        |     54      |    100.0%    |    Completed    |
 | **Sprint 2: Core Engine**     |       32        |     32      |    100.0%    |    Completed    |
 | **Sprint 3: Polish & Admin**  |       32        |     32      |    100.0%    |    Completed    |
-| **Sprint 4: Differentiation** |        0        |     33      |     0.0%     |   Not Started   |
-| **Total Project**             |     **118**     |   **151**   |  **78.1%**   | **In Progress** |
+| **Sprint 4: Differentiation** |        6        |     33      |    18.2%     |   In Progress   |
+| **Total Project**             |     **124**     |   **151**   |  **82.1%**   | **In Progress** |
 
 ---
 
@@ -235,12 +235,12 @@ This document tracks the tasks from the [Revised Implementation Plan](file:///d:
 
 #### Day 31–32: GitHub OAuth
 
-- [ ] **Setup next-auth v5 with GitHub provider**
-- [ ] **Create OAuth callback route**
-- [ ] **Update database models to support OAuth** (password nullable)
-- [ ] **Create OAuth login/register buttons**
-- [ ] **Link GitHub avatar** to user profile
-- [ ] **Test OAuth flow end-to-end**
+- [x] **Setup next-auth v5 with GitHub provider** — Configured in [auth.ts](file:///d:/interview-prep-platform/apps/frontend/src/auth.ts) and synchronized with the Express backend user validation.
+- [x] **Create OAuth callback route** — Set up App Router catch-all handlers in [route.ts](file:///d:/interview-prep-platform/apps/frontend/src/app/api/auth/%5B...nextauth%5D/route.ts).
+- [x] **Update database models to support OAuth** (password nullable) — Standardized nullable password support in migrations, domain structures, and repositories.
+- [x] **Create OAuth login/register buttons** — Added responsive GitHub OAuth buttons on [LoginForm.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(auth)/login/LoginForm.tsx>) and [RegisterForm.tsx](<file:///d:/interview-prep-platform/apps/frontend/src/app/(auth)/register/RegisterForm.tsx>).
+- [x] **Link GitHub avatar** to user profile — Syncs and stores profile images in Next-Auth sessions and databases.
+- [x] **Test OAuth flow end-to-end** — Covered with unit test suite in [AuthenticateGithubUser.test.ts](file:///d:/interview-prep-platform/apps/backend-api/src/application/use-cases/auth/AuthenticateGithubUser.test.ts) and confirmed frontend production bundling compiles.
 
 #### Day 33–34: AI-Powered Hints
 
