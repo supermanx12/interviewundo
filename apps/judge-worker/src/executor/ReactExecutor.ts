@@ -36,8 +36,9 @@ try {
       // Clean up imports and exports so it runs cleanly in JSDOM global context
       const cleaned = content
         .replace(/import\\s+.*?\\s+from\\s+['"]react['"];?/g, '')
+        .replace(/import\\s+.*?\\s+from\\s+['"]react-dom\\/client['"];?/g, '')
         .replace(/import\\s+.*?\\s+from\\s+['"]react-dom['"];?/g, '')
-        .replace(/import\\s+.*?\\s+from\\s+['"].*?['"];?/g, '')
+        .replace(/import\\s+.*?\\s+from\\s+['"]\\.\\/.+?['"];?/g, '')
         .replace(/export\\s+default\\s+/g, '')
         .replace(/export\\s+const\\s+/g, 'const ')
         .replace(/export\\s+function\\s+/g, 'function ');
@@ -81,9 +82,9 @@ try {
 
   // Expose React globally to JSDOM window
   const React = require('react');
-  const ReactDOM = require('react-dom');
+  const ReactDOMClient = require('react-dom/client');
   dom.window.React = React;
-  dom.window.ReactDOM = ReactDOM;
+  dom.window.ReactDOM = ReactDOMClient;
 
   // Mock global fetch for API call challenges
   dom.window.fetch = async (url) => {
@@ -133,7 +134,7 @@ try {
         dom.window.__mockFetchError = parsedInput.mockError || null;
 
         // Render App
-        const root = ReactDOM.createRoot(rootDiv);
+        const root = ReactDOMClient.createRoot(rootDiv);
         root.render(React.createElement(App));
         await flushPromises();
 
