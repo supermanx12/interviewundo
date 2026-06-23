@@ -3,29 +3,31 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import Editor from '@monaco-editor/react';
-import ReactMarkdown from 'react-markdown';
 import { useAuth, useSocket, useToast } from '@/providers';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { DifficultyBadge } from '@/components/ui/difficulty-badge';
-import Link from 'next/link';
-import {
-  Loader2,
-  ChevronLeft,
-  Play,
-  Send,
-  RotateCcw,
-  Sparkles,
-  BookOpen,
-  Terminal,
-  Settings,
-  HelpCircle,
-  FileCode,
-  History,
-} from 'lucide-react';
+import { ChevronLeft, RotateCcw, Settings, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ReactWorkspace from '@/components/workspace/ReactWorkspace';
+import { ProblemDescriptionPanel } from './ProblemDescriptionPanel';
+import { ProblemEditorPanel } from './ProblemEditorPanel';
+
+const getCategoryEditorConfig = (cat: string) => {
+  switch (cat) {
+    case 'JAVASCRIPT':
+    case 'NODEJS':
+    case 'REACT':
+      return { language: 'javascript', filename: 'solution.js' };
+    case 'TYPESCRIPT':
+      return { language: 'typescript', filename: 'solution.ts' };
+    case 'SQL':
+      return { language: 'sql', filename: 'query.sql' };
+    case 'MONGODB':
+      return { language: 'javascript', filename: 'pipeline.js' };
+    default:
+      return { language: 'javascript', filename: 'solution.js' };
+  }
+};
 
 export default function ProblemWorkspacePage() {
   const { slug } = useParams() as { slug: string };
@@ -39,24 +41,7 @@ export default function ProblemWorkspacePage() {
   const [fontSize, setFontSize] = useState<number>(14);
   const [code, setCode] = useState<string>('');
 
-  const getCategoryEditorConfig = (cat: string) => {
-    switch (cat) {
-      case 'JAVASCRIPT':
-      case 'NODEJS':
-      case 'REACT':
-        return { language: 'javascript', filename: 'solution.js' };
-      case 'TYPESCRIPT':
-        return { language: 'typescript', filename: 'solution.ts' };
-      case 'SQL':
-        return { language: 'sql', filename: 'query.sql' };
-      case 'MONGODB':
-        return { language: 'javascript', filename: 'pipeline.js' };
-      default:
-        return { language: 'javascript', filename: 'solution.js' };
-    }
-  };
-
-  // Mobile Navigation: 'description' | 'code' | 'output'
+  // Mobile Navigation: 'description' | 'code'
   const [mobileTab, setMobileTab] = useState<'description' | 'code'>('description');
 
   // Output Console State
@@ -71,38 +56,6 @@ export default function ProblemWorkspacePage() {
     passed?: boolean;
     error?: string;
   } | null>(null);
-
-  // AI Hint State
-  const [hint, setHint] = useState<string | null>(null);
-  const [hintError, setHintError] = useState<string | null>(null);
-  const [isHintLoading, setIsHintLoading] = useState(false);
-  const [remainingHints, setRemainingHints] = useState<number | null>(null);
-
-  const handleFetchHint = async () => {
-    setIsHintLoading(true);
-    setHintError(null);
-    try {
-      const response = await apiFetch<{ hint: string; remainingHints: number }>(
-        `/api/problems/${slug}/hint`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code }),
-        },
-      );
-      setHint(response.hint);
-      setRemainingHints(response.remainingHints);
-      showSuccess('AI Hint generated!');
-    } catch (err: any) {
-      const msg = err.message || 'Failed to generate hint';
-      setHintError(msg);
-      showError(msg);
-    } finally {
-      setIsHintLoading(false);
-    }
-  };
 
   // Fetch Problem Details
   const {
@@ -341,6 +294,7 @@ export default function ProblemWorkspacePage() {
           We encountered an error loading the challenge description and editor configuration.
         </p>
         <Button
+          type="button"
           onClick={() => router.push('/problems')}
           className="rounded-xl font-bold active:scale-95 transition-all"
         >
@@ -360,6 +314,7 @@ export default function ProblemWorkspacePage() {
       <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-card/45 backdrop-blur-sm select-none">
         <div className="flex items-center gap-4">
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             onClick={() => router.push('/problems')}
@@ -394,6 +349,7 @@ export default function ProblemWorkspacePage() {
 
           {/* Theme Selector */}
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => setEditorTheme(editorTheme === 'vs-dark' ? 'light' : 'vs-dark')}
@@ -404,6 +360,7 @@ export default function ProblemWorkspacePage() {
 
           {/* Reset Code */}
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={handleResetCode}
@@ -418,6 +375,7 @@ export default function ProblemWorkspacePage() {
       {/* Mobile Navigation Tabs */}
       <div className="flex border-b border-border md:hidden shrink-0 select-none">
         <button
+          type="button"
           onClick={() => setMobileTab('description')}
           className={cn(
             'flex-1 py-3 text-center text-xs font-bold border-b-2 transition-all cursor-pointer',
@@ -429,6 +387,7 @@ export default function ProblemWorkspacePage() {
           Description
         </button>
         <button
+          type="button"
           onClick={() => setMobileTab('code')}
           className={cn(
             'flex-1 py-3 text-center text-xs font-bold border-b-2 transition-all cursor-pointer',
@@ -450,82 +409,7 @@ export default function ProblemWorkspacePage() {
             mobileTab === 'description' ? 'flex' : 'hidden md:flex',
           )}
         >
-          <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20 shrink-0 text-xs font-semibold text-muted-foreground select-none">
-            <div className="flex items-center gap-1.5">
-              <BookOpen size={13} />
-              Problem Description
-            </div>
-            <Link
-              href="/submissions"
-              className="text-xs text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold flex items-center gap-1 active:scale-95 transition-all"
-            >
-              <History size={12} />
-              Submissions History
-            </Link>
-          </div>
-
-          <div className="flex-1 overflow-y-auto px-6 py-5 prose prose-indigo dark:prose-invert max-w-none scrollbar-thin">
-            <ReactMarkdown>{problem.description}</ReactMarkdown>
-
-            {/* AI Hint Section */}
-            <div className="mt-8 pt-6 border-t border-border/60 not-prose">
-              <div className="bg-gradient-to-br from-indigo-500/5 to-violet-500/5 rounded-2xl border border-indigo-500/10 p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-                    <h4 className="text-sm font-bold text-foreground">AI Conceptual Hints</h4>
-                  </div>
-                  {remainingHints !== null && (
-                    <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full">
-                      {remainingHints} / 3 remaining today
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Stuck on this problem? Ask Grok for a high-level conceptual hint. Grok will
-                  analyze your current code and guide you without giving away the solution.
-                </p>
-
-                {hint && (
-                  <div className="bg-card/40 border border-indigo-500/20 rounded-xl p-4 text-xs text-foreground leading-relaxed shadow-sm relative group animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className="absolute top-0 right-0 -mr-2 -mt-2 w-16 h-16 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
-                    <span className="inline-block text-[9px] font-bold text-indigo-400 tracking-wider uppercase mb-1.5">
-                      Grok's Hint
-                    </span>
-                    <p className="font-medium text-foreground/90">{hint}</p>
-                  </div>
-                )}
-
-                {hintError && (
-                  <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-xl p-3.5 text-xs font-semibold leading-relaxed flex items-center gap-2">
-                    <span>{hintError}</span>
-                  </div>
-                )}
-
-                <div className="flex justify-end pt-1">
-                  <Button
-                    onClick={handleFetchHint}
-                    disabled={isHintLoading || (remainingHints !== null && remainingHints <= 0)}
-                    size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md active:scale-95 transition-all flex items-center gap-1.5"
-                  >
-                    {isHintLoading ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Generating Hint...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Get AI Hint
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ProblemDescriptionPanel description={problem.description} slug={slug} code={code} />
         </div>
 
         {/* Right Side: Editor & Output Panel */}
@@ -535,171 +419,21 @@ export default function ProblemWorkspacePage() {
             mobileTab === 'code' ? 'flex' : 'hidden md:flex',
           )}
         >
-          {/* Top Panel: Monaco Editor */}
-          <div className="flex-1 flex flex-col min-h-0 relative">
-            <div className="flex items-center justify-between px-6 py-2 border-b border-border bg-[#181818] shrink-0 text-xs font-semibold text-zinc-400 select-none">
-              <div className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-zinc-300">
-                <FileCode size={13} className="text-zinc-400" />
-                {editorConfig.filename}
-              </div>
-
-              <div className="bg-[#2a2a2a]/60 border border-zinc-800/80 px-2.5 py-1 rounded text-zinc-400 font-mono text-[9px] select-none uppercase tracking-wider font-extrabold">
-                {problem.category}
-              </div>
-            </div>
-
-            <div className="flex-1 min-h-0 bg-[#1e1e1e]">
-              <Editor
-                height="100%"
-                language={editorConfig.language}
-                theme={editorTheme}
-                value={code}
-                onChange={(val) => setCode(val || '')}
-                options={{
-                  fontSize: fontSize,
-                  minimap: { enabled: false },
-                  scrollbar: {
-                    vertical: 'visible',
-                    horizontal: 'visible',
-                    verticalScrollbarSize: 10,
-                    horizontalScrollbarSize: 10,
-                  },
-                  scrollBeyondLastLine: false,
-                  lineNumbers: 'on',
-                  automaticLayout: true,
-                  fontFamily:
-                    'Fira Code, JetBrains Mono, source-code-pro, Menlo, Monaco, Consolas, Courier New, monospace',
-                  fontLigatures: true,
-                  padding: { top: 12, bottom: 12 },
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Bottom Panel: Tabbed Console/Output */}
-          <div className="h-60 border-t border-border flex flex-col bg-[#151515] shrink-0 min-h-0">
-            {/* Console Header */}
-            <div className="flex items-center justify-between border-b border-border bg-[#111111] px-6 py-2 shrink-0 select-none">
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setConsoleTab('testcases')}
-                  className={cn(
-                    'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer',
-                    consoleTab === 'testcases'
-                      ? 'bg-zinc-800 text-white'
-                      : 'text-zinc-500 hover:text-zinc-300',
-                  )}
-                >
-                  <Terminal size={12} />
-                  Test Cases
-                </button>
-                <button
-                  onClick={() => setConsoleTab('result')}
-                  className={cn(
-                    'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer',
-                    consoleTab === 'result'
-                      ? 'bg-zinc-800 text-white'
-                      : 'text-zinc-500 hover:text-zinc-300',
-                  )}
-                >
-                  <Sparkles size={12} />
-                  Result
-                </button>
-              </div>
-
-              {/* Console Execution Controls */}
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleRunCode}
-                  disabled={isRunning || isSubmitting}
-                  className="h-8.5 px-3 rounded-lg border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800 text-xs font-bold active:scale-95 transition-all"
-                >
-                  {isRunning ? (
-                    <Loader2 size={13} className="animate-spin mr-1" />
-                  ) : (
-                    <Play size={12} className="mr-1.5 fill-current" />
-                  )}
-                  Run Code
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSubmitCode}
-                  disabled={isRunning || isSubmitting}
-                  className="h-8.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold active:scale-95 shadow-sm shadow-emerald-600/10 hover:shadow-emerald-500/20 border-transparent transition-all"
-                >
-                  {isSubmitting ? (
-                    <Loader2 size={13} className="animate-spin mr-1" />
-                  ) : (
-                    <Send size={12} className="mr-1.5" />
-                  )}
-                  Submit
-                </Button>
-              </div>
-            </div>
-
-            {/* Console Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 font-mono text-xs text-zinc-300 leading-normal scrollbar-thin">
-              {consoleTab === 'testcases' ? (
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-zinc-500 font-bold mb-1 text-[10px] uppercase select-none">
-                      Test Case Example
-                    </div>
-                    <pre className="p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-zinc-300">
-                      Input: nums = [2, 7, 11, 15], target = 9
-                    </pre>
-                  </div>
-                  <div>
-                    <div className="text-zinc-500 font-bold mb-1 text-[10px] uppercase select-none">
-                      Expected Output
-                    </div>
-                    <pre className="p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-zinc-300">
-                      [0, 1]
-                    </pre>
-                  </div>
-                </div>
-              ) : (
-                <div className="h-full flex flex-col justify-center">
-                  {isRunning ? (
-                    <div className="flex items-center justify-center gap-2 text-zinc-400 py-6 select-none animate-pulse">
-                      <Loader2 size={14} className="animate-spin" />
-                      Executing code against test cases...
-                    </div>
-                  ) : isSubmitting ? (
-                    <div className="flex items-center justify-center gap-2 text-zinc-400 py-6 select-none animate-pulse">
-                      <Loader2 size={14} className="animate-spin text-emerald-500" />
-                      Submitting solution to judge queue...
-                    </div>
-                  ) : consoleOutput ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 select-none">
-                        <span
-                          className={cn(
-                            'px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider uppercase',
-                            consoleOutput.status === 'Accepted' ||
-                              consoleOutput.status === 'Finished'
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
-                          )}
-                        >
-                          {consoleOutput.status}
-                        </span>
-                      </div>
-                      <pre className="p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                        {consoleOutput.stdout}
-                      </pre>
-                    </div>
-                  ) : (
-                    <div className="text-center text-zinc-500 py-10 select-none">
-                      Run or Submit code to inspect runtime execution results.
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          <ProblemEditorPanel
+            code={code}
+            setCode={setCode}
+            editorConfig={editorConfig}
+            editorTheme={editorTheme}
+            fontSize={fontSize}
+            consoleTab={consoleTab}
+            setConsoleTab={setConsoleTab}
+            isRunning={isRunning}
+            isSubmitting={isSubmitting}
+            consoleOutput={consoleOutput}
+            handleRunCode={handleRunCode}
+            handleSubmitCode={handleSubmitCode}
+            category={problem.category}
+          />
         </div>
       </div>
     </div>

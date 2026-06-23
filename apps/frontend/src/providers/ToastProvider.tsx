@@ -93,6 +93,33 @@ export function useToast() {
 // Inner Toast Item Component with auto-close timers
 // ============================================================
 
+const toastConfigs = {
+  success: {
+    border: 'border-emerald-500/30 dark:border-emerald-500/20',
+    bg: 'bg-emerald-500/10 dark:bg-emerald-950/20',
+    text: 'text-emerald-600 dark:text-emerald-400',
+    icon: CheckCircle2,
+  },
+  error: {
+    border: 'border-rose-500/30 dark:border-rose-500/20',
+    bg: 'bg-rose-500/10 dark:bg-rose-950/20',
+    text: 'text-rose-600 dark:text-rose-400',
+    icon: AlertCircle,
+  },
+  warning: {
+    border: 'border-amber-500/30 dark:border-amber-500/20',
+    bg: 'bg-amber-500/10 dark:bg-amber-950/20',
+    text: 'text-amber-600 dark:text-amber-400',
+    icon: AlertTriangle,
+  },
+  info: {
+    border: 'border-indigo-500/30 dark:border-indigo-500/20',
+    bg: 'bg-indigo-500/10 dark:bg-indigo-950/20',
+    text: 'text-indigo-600 dark:text-indigo-400',
+    icon: Info,
+  },
+};
+
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: (id: string) => void }) {
   const [isExiting, setIsExiting] = useState(false);
 
@@ -111,34 +138,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: (id: string) => 
     return () => clearTimeout(timer);
   }, [toast.duration, handleClose]);
 
-  const configs = {
-    success: {
-      border: 'border-emerald-500/30 dark:border-emerald-500/20',
-      bg: 'bg-emerald-500/10 dark:bg-emerald-950/20',
-      text: 'text-emerald-600 dark:text-emerald-400',
-      icon: CheckCircle2,
-    },
-    error: {
-      border: 'border-rose-500/30 dark:border-rose-500/20',
-      bg: 'bg-rose-500/10 dark:bg-rose-950/20',
-      text: 'text-rose-600 dark:text-rose-400',
-      icon: AlertCircle,
-    },
-    warning: {
-      border: 'border-amber-500/30 dark:border-amber-500/20',
-      bg: 'bg-amber-500/10 dark:bg-amber-950/20',
-      text: 'text-amber-600 dark:text-amber-400',
-      icon: AlertTriangle,
-    },
-    info: {
-      border: 'border-indigo-500/30 dark:border-indigo-500/20',
-      bg: 'bg-indigo-500/10 dark:bg-indigo-950/20',
-      text: 'text-indigo-600 dark:text-indigo-400',
-      icon: Info,
-    },
-  };
-
-  const config = configs[toast.type];
+  const config = toastConfigs[toast.type];
   const Icon = config.icon;
 
   return (
@@ -158,6 +158,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: (id: string) => 
       </div>
 
       <button
+        type="button"
         onClick={handleClose}
         className="text-muted-foreground/60 hover:text-foreground hover:bg-muted p-1 rounded-lg shrink-0 transition-colors"
       >

@@ -5,47 +5,39 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/providers';
 import { cn } from '@/lib/utils';
-import {
-  LayoutDashboard,
-  Code2,
-  History,
-  User,
-  Shield,
-  LogOut,
-  Terminal,
-} from 'lucide-react';
+import { LayoutDashboard, Code2, History, User, Shield, LogOut, Terminal } from 'lucide-react';
 
 interface SidebarProps {
   className?: string;
   onLinkClick?: () => void;
 }
 
+const navItems = [
+  {
+    label: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    label: 'Problems',
+    href: '/problems',
+    icon: Code2,
+  },
+  {
+    label: 'Submissions',
+    href: '/submissions',
+    icon: History,
+  },
+  {
+    label: 'Profile',
+    href: '/profile',
+    icon: User,
+  },
+];
+
 export function Sidebar({ className, onLinkClick }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-
-  const navItems = [
-    {
-      label: 'Dashboard',
-      href: '/dashboard',
-      icon: LayoutDashboard,
-    },
-    {
-      label: 'Problems',
-      href: '/problems',
-      icon: Code2,
-    },
-    {
-      label: 'Submissions',
-      href: '/submissions',
-      icon: History,
-    },
-    {
-      label: 'Profile',
-      href: '/profile',
-      icon: User,
-    },
-  ];
 
   const isAdmin = user?.role === 'ADMIN';
 
@@ -53,7 +45,7 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
     <aside
       className={cn(
         'w-64 border-r border-border bg-card/60 backdrop-blur-md flex flex-col h-full',
-        className
+        className,
       )}
     >
       {/* Brand Logo Header */}
@@ -79,10 +71,13 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
                 'flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 active:scale-[0.98]',
                 isActive
                   ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/10'
-                  : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
               )}
             >
-              <item.icon size={18} className={cn('shrink-0', isActive ? 'text-current' : 'text-muted-foreground/80')} />
+              <item.icon
+                size={18}
+                className={cn('shrink-0', isActive ? 'text-current' : 'text-muted-foreground/80')}
+              />
               {item.label}
             </Link>
           );
@@ -101,7 +96,7 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
                 'flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 active:scale-[0.98]',
                 pathname.startsWith('/admin')
                   ? 'bg-rose-600 text-white shadow-sm shadow-rose-500/10'
-                  : 'text-muted-foreground hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400'
+                  : 'text-muted-foreground hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400',
               )}
             >
               <Shield size={18} className="shrink-0" />
@@ -119,15 +114,14 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
               {user.name.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold truncate leading-none mb-1">
-                {user.name}
-              </p>
+              <p className="text-xs font-semibold truncate leading-none mb-1">{user.name}</p>
               <p className="text-[10px] text-muted-foreground truncate leading-none">
                 {user.email}
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={logout}
             className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-all duration-200 active:scale-95"
           >

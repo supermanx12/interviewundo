@@ -10,7 +10,9 @@ import { useAuth, useToast } from '@/providers';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff, Loader2, AlertCircle, Terminal, Check, X } from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertCircle, Terminal } from 'lucide-react';
+import { PasswordStrengthMeter } from './PasswordStrengthMeter';
+import { OAuthButtons } from './OAuthButtons';
 
 export default function RegisterForm() {
   const { register: registerUser } = useAuth();
@@ -35,30 +37,6 @@ export default function RegisterForm() {
   });
 
   const password = watch('password', '');
-
-  // Track password strength criteria
-  const criteria = {
-    length: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
-  };
-
-  const score = Object.values(criteria).filter(Boolean).length;
-
-  const getStrengthText = () => {
-    if (!password) return 'Too short';
-    if (score <= 1) return 'Weak';
-    if (score <= 3) return 'Medium';
-    return 'Strong';
-  };
-
-  const getStrengthColor = () => {
-    if (!password) return 'bg-muted';
-    if (score <= 1) return 'bg-rose-500';
-    if (score <= 3) return 'bg-amber-500';
-    return 'bg-emerald-500';
-  };
 
   const onSubmit = async (data: RegisterDTO) => {
     setServerError(null);
@@ -170,80 +148,7 @@ export default function RegisterForm() {
           </div>
 
           {/* Password Strength Meter */}
-          {password && (
-            <div className="space-y-2.5 pt-1">
-              <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-muted-foreground/80">Password Strength:</span>
-                <span
-                  className={
-                    score === 4
-                      ? 'text-emerald-500'
-                      : score >= 2
-                        ? 'text-amber-500'
-                        : 'text-rose-500'
-                  }
-                >
-                  {getStrengthText()}
-                </span>
-              </div>
-
-              {/* Animated Progress Bar */}
-              <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden flex gap-0.5">
-                {[1, 2, 3, 4].map((barIdx) => (
-                  <div
-                    key={barIdx}
-                    className={`flex-1 h-full rounded-full transition-all duration-300 ${
-                      score >= barIdx ? getStrengthColor() : 'bg-muted'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              {/* Requirement Checklist */}
-              <ul className="text-[10px] grid grid-cols-2 gap-x-4 gap-y-1.5 pt-1">
-                <li className="flex items-center gap-1.5 font-semibold text-muted-foreground">
-                  {criteria.length ? (
-                    <Check size={11} className="text-emerald-500 shrink-0" />
-                  ) : (
-                    <X size={11} className="text-muted-foreground/60 shrink-0" />
-                  )}
-                  <span className={criteria.length ? 'text-emerald-500/90' : ''}>
-                    8+ Characters
-                  </span>
-                </li>
-                <li className="flex items-center gap-1.5 font-semibold text-muted-foreground">
-                  {criteria.uppercase ? (
-                    <Check size={11} className="text-emerald-500 shrink-0" />
-                  ) : (
-                    <X size={11} className="text-muted-foreground/60 shrink-0" />
-                  )}
-                  <span className={criteria.uppercase ? 'text-emerald-500/90' : ''}>
-                    Uppercase Letter
-                  </span>
-                </li>
-                <li className="flex items-center gap-1.5 font-semibold text-muted-foreground">
-                  {criteria.lowercase ? (
-                    <Check size={11} className="text-emerald-500 shrink-0" />
-                  ) : (
-                    <X size={11} className="text-muted-foreground/60 shrink-0" />
-                  )}
-                  <span className={criteria.lowercase ? 'text-emerald-500/90' : ''}>
-                    Lowercase Letter
-                  </span>
-                </li>
-                <li className="flex items-center gap-1.5 font-semibold text-muted-foreground">
-                  {criteria.number ? (
-                    <Check size={11} className="text-emerald-500 shrink-0" />
-                  ) : (
-                    <X size={11} className="text-muted-foreground/60 shrink-0" />
-                  )}
-                  <span className={criteria.number ? 'text-emerald-500/90' : ''}>
-                    At least one number
-                  </span>
-                </li>
-              </ul>
-            </div>
-          )}
+          <PasswordStrengthMeter password={password} />
 
           {/* Submit button */}
           <Button
@@ -272,62 +177,7 @@ export default function RegisterForm() {
         </div>
 
         {/* OAuth Buttons */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {/* GitHub OAuth Button */}
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11 rounded-xl border-border bg-background/50 hover:bg-accent/40 font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-            onClick={() => {
-              import('next-auth/react').then(({ signIn }) => {
-                signIn('github', { callbackUrl: '/dashboard' });
-              });
-            }}
-            disabled={isSubmitting}
-          >
-            <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.164 22 16.418 22 12c0-5.523-4.477-10-10-10z"
-              />
-            </svg>
-            GitHub
-          </Button>
-
-          {/* Google OAuth Button */}
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11 rounded-xl border-border bg-background/50 hover:bg-accent/40 font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-            onClick={() => {
-              import('next-auth/react').then(({ signIn }) => {
-                signIn('google', { callbackUrl: '/dashboard' });
-              });
-            }}
-            disabled={isSubmitting}
-          >
-            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335"
-              />
-            </svg>
-            Google
-          </Button>
-        </div>
+        <OAuthButtons disabled={isSubmitting} />
 
         <div className="text-center">
           <p className="text-xs text-muted-foreground">

@@ -20,24 +20,24 @@ import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
+const adminNavItems = [
+  {
+    label: 'Stats Overview',
+    href: '/admin',
+    icon: LayoutDashboard,
+    exact: true,
+  },
+  {
+    label: 'Problem Database',
+    href: '/admin/problems',
+    icon: Code2,
+    exact: false,
+  },
+];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-
-  const adminNavItems = [
-    {
-      label: 'Stats Overview',
-      href: '/admin',
-      icon: LayoutDashboard,
-      exact: true,
-    },
-    {
-      label: 'Problem Database',
-      href: '/admin/problems',
-      icon: Code2,
-      exact: false,
-    },
-  ];
 
   const renderNavLinks = (onItemClick?: () => void) => {
     return (
@@ -125,6 +125,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
             <button
+              type="button"
               onClick={() => {
                 if (onItemClick) onItemClick();
                 logout();
