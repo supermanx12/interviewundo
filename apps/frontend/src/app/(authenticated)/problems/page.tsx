@@ -17,6 +17,8 @@ const categories = [
   { value: 'REACT', label: 'React' },
   { value: 'NODEJS', label: 'Node.js' },
   { value: 'TYPESCRIPT', label: 'TypeScript' },
+  { value: 'SQL', label: 'SQL' },
+  { value: 'MONGODB', label: 'MongoDB' },
 ] as const;
 
 export default function ProblemsPage() {
@@ -26,7 +28,7 @@ export default function ProblemsPage() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState<
-    'ALL' | 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT'
+    'ALL' | 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB'
   >('ALL');
   const [difficulty, setDifficulty] = useState<'ALL' | 'EASY' | 'MEDIUM' | 'HARD'>('ALL');
   const [page, setPage] = useState(1);

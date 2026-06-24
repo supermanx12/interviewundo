@@ -12,7 +12,7 @@ interface Problem {
   slug: string;
   description: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  category: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT';
+  category: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB';
   starterCode: string;
   solutionCode?: string | null;
   tags: string[];

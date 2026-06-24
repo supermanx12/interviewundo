@@ -30,7 +30,7 @@ interface Problem {
   slug: string;
   description: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  category: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT';
+  category: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB';
   starterCode: string;
   solutionCode?: string | null;
   tags: string[];
@@ -62,7 +62,7 @@ export default function AdminProblemsPage() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState<
-    'ALL' | 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT'
+    'ALL' | 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB'
   >('ALL');
   const [difficulty, setDifficulty] = useState<'ALL' | 'EASY' | 'MEDIUM' | 'HARD'>('ALL');
   const [page, setPage] = useState(1);
@@ -119,7 +119,7 @@ export default function AdminProblemsPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formDifficulty, setFormDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
   const [formCategory, setFormCategory] = useState<
-    'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT'
+    'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB'
   >('JAVASCRIPT');
   const [formStarterCode, setFormStarterCode] = useState('');
   const [formSolutionCode, setFormSolutionCode] = useState('');
@@ -420,6 +420,8 @@ export default function AdminProblemsPage() {
               { value: 'REACT', label: 'React' },
               { value: 'NODEJS', label: 'Node.js' },
               { value: 'TYPESCRIPT', label: 'TypeScript' },
+              { value: 'SQL', label: 'SQL' },
+              { value: 'MONGODB', label: 'MongoDB' },
             ].map((cat) => {
               const isActive = category === cat.value;
               return (

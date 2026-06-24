@@ -20,7 +20,7 @@ interface Problem {
   slug: string;
   description: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  category: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT';
+  category: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB';
   starterCode: string;
   solutionCode?: string | null;
   tags: string[];
@@ -39,8 +39,10 @@ interface ProblemFormDialogProps {
   setFormDescription: (val: string) => void;
   formDifficulty: 'EASY' | 'MEDIUM' | 'HARD';
   setFormDifficulty: (val: 'EASY' | 'MEDIUM' | 'HARD') => void;
-  formCategory: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT';
-  setFormCategory: (val: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT') => void;
+  formCategory: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB';
+  setFormCategory: (
+    val: 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB',
+  ) => void;
   formStarterCode: string;
   setFormStarterCode: (val: string) => void;
   formSolutionCode: string;
@@ -118,6 +120,8 @@ export function ProblemFormDialog({
                 <option value="REACT">React Component</option>
                 <option value="NODEJS">Node.js API</option>
                 <option value="TYPESCRIPT">TypeScript</option>
+                <option value="SQL">SQL Database</option>
+                <option value="MONGODB">MongoDB Database</option>
               </select>
             </div>
           </div>
