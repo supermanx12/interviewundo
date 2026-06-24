@@ -29,7 +29,7 @@ authRoutes.post('/refreshToken', validateRequest(RefreshTokenSchema), (req, res,
 
 const GithubAuthSchema = z.object({
   githubId: z.string().min(1, 'Github ID is required'),
-  email: z.string().email('Invalid email address'),
+  email: z.string().email('Invalid email address').toLowerCase(),
   name: z.string().min(1, 'Name is required'),
   image: z.string().nullable().optional(),
 });
@@ -40,7 +40,7 @@ authRoutes.post('/github', validateRequest(GithubAuthSchema), (req, res, next) =
 
 const GoogleAuthSchema = z.object({
   googleId: z.string().min(1, 'Google ID is required'),
-  email: z.string().email('Invalid email address'),
+  email: z.string().email('Invalid email address').toLowerCase(),
   name: z.string().min(1, 'Name is required'),
   image: z.string().nullable().optional(),
 });

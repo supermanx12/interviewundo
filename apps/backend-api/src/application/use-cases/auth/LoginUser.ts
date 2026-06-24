@@ -17,8 +17,9 @@ export class LoginUser implements IUseCase<LoginDTO, AuthResponseDTO> {
   ) {}
 
   async execute(input: LoginDTO): Promise<AuthResponseDTO> {
+    const email = input.email.toLowerCase();
     // Find user by email
-    const user = await this.userRepository.findByEmail(input.email);
+    const user = await this.userRepository.findByEmail(email);
     if (!user || !user.password) {
       throw new AuthenticationError('Invalid email or password');
     }

@@ -30,7 +30,8 @@ export class AuthenticateGoogleUser implements IUseCase<AuthenticateGoogleDTO, A
       }
     } else {
       // 2. Check if a user with this email already exists (originally password-based or GitHub)
-      const existingEmailUser = await this.userRepository.findByEmail(input.email);
+      const email = input.email.toLowerCase();
+      const existingEmailUser = await this.userRepository.findByEmail(email);
 
       if (existingEmailUser) {
         // Link Google to this existing account
@@ -43,7 +44,7 @@ export class AuthenticateGoogleUser implements IUseCase<AuthenticateGoogleDTO, A
         // 3. Register a new user
         user = await this.userRepository.create({
           name: input.name,
-          email: input.email,
+          email,
           password: null, // Nullable for OAuth users
           role: 'STUDENT',
           googleId: input.googleId,

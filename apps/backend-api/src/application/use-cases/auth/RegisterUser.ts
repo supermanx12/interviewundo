@@ -19,8 +19,10 @@ export class RegisterUser implements IUseCase<RegisterDTO, AuthResponseDTO> {
   ) {}
 
   async execute(input: RegisterDTO): Promise<AuthResponseDTO> {
+    const email = input.email.toLowerCase();
+
     // Check if user already exists
-    const existingUser = await this.userRepository.findByEmail(input.email);
+    const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new ConflictError('A user with this email already exists');
     }
@@ -31,7 +33,7 @@ export class RegisterUser implements IUseCase<RegisterDTO, AuthResponseDTO> {
     // Create user
     const user = await this.userRepository.create({
       name: input.name,
-      email: input.email,
+      email,
       password: hashedPassword,
       role: 'STUDENT',
     });
