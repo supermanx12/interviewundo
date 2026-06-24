@@ -3,58 +3,90 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
-import { BookOpen, History, Sparkles, Loader2 } from 'lucide-react';
+import { BookOpen, History, Sparkles, FileCode, Lock, Unlock, Eye, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth, useToast } from '@/providers';
+import { useToast } from '@/providers';
+import { cn } from '@/lib/utils';
 
 interface ProblemDescriptionPanelProps {
   description: string;
   slug: string;
   code: string;
+  solutionCode?: string | null;
 }
 
-export function ProblemDescriptionPanel({ description, slug, code }: ProblemDescriptionPanelProps) {
-  const { apiFetch } = useAuth();
-  const { success: showSuccess, error: showError } = useToast();
+const staticHints = [
+  'Analyze input constraints and edge cases. Check for empty inputs, null values, or single element inputs.',
+  'Think about optimal data structures. Using a Map or a Set can help reduce lookup time from linear O(N) to constant O(1).',
+  'Consider complexity trade-offs. Using two-pointers or a hash map can avoid nested loops and optimize time to O(N).',
+  'Handle edge cases and boundary conditions (e.g., negative numbers, integer overflow, duplicate values) in your code.',
+];
 
-  // AI Hint State
-  const [hint, setHint] = useState<string | null>(null);
-  const [hintError, setHintError] = useState<string | null>(null);
-  const [isHintLoading, setIsHintLoading] = useState(false);
-  const [remainingHints, setRemainingHints] = useState<number | null>(null);
+export function ProblemDescriptionPanel({
+  description,
+  slug,
+  solutionCode,
+}: ProblemDescriptionPanelProps) {
+  const { success: showSuccess } = useToast();
 
-  const handleFetchHint = async () => {
-    setIsHintLoading(true);
-    setHintError(null);
-    try {
-      const response = await apiFetch<{ hint: string; remainingHints: number }>(
-        `/api/problems/${slug}/hint`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code }),
-        },
-      );
-      setHint(response.hint);
-      setRemainingHints(response.remainingHints);
-      showSuccess('AI Hint generated!');
-    } catch (err: any) {
-      const msg = err.message || 'Failed to generate hint';
-      setHintError(msg);
-      showError(msg);
-    } finally {
-      setIsHintLoading(false);
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'description' | 'solution'>('description');
+
+  // Hints Progression State
+  const [unlockedHints, setUnlockedHints] = useState<boolean[]>([true, false, false, false]);
+  const [revealedHints, setRevealedHints] = useState<boolean[]>([false, false, false, false]);
+
+  const handleUnlockNext = (currentIndex: number) => {
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < 4) {
+      setUnlockedHints((prev) => {
+        const next = [...prev];
+        next[nextIndex] = true;
+        return next;
+      });
+      showSuccess(`Hint ${nextIndex + 1} unlocked!`);
     }
+  };
+
+  const handleReveal = (index: number) => {
+    setRevealedHints((prev) => {
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
   };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20 shrink-0 text-xs font-semibold text-muted-foreground select-none">
+      {/* Tab bar header */}
+      <div className="flex items-center justify-between px-6 py-2 border-b border-border bg-muted/20 shrink-0 text-xs font-semibold select-none">
         <div className="flex items-center gap-1.5">
-          <BookOpen size={13} />
-          Problem Description
+          <button
+            type="button"
+            onClick={() => setActiveTab('description')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border-none',
+              activeTab === 'description'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <BookOpen size={13} />
+            Description
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('solution')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border-none',
+              activeTab === 'solution'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <FileCode size={13} />
+            Solution
+          </button>
         </div>
         <Link
           href="/submissions"
@@ -65,69 +97,130 @@ export function ProblemDescriptionPanel({ description, slug, code }: ProblemDesc
         </Link>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-5 prose prose-indigo dark:prose-invert max-w-none scrollbar-thin">
-        <ReactMarkdown>{description}</ReactMarkdown>
+      {/* Description Tab Content */}
+      {activeTab === 'description' && (
+        <div className="flex-1 overflow-y-auto px-6 py-5 prose prose-indigo dark:prose-invert max-w-none scrollbar-thin">
+          <ReactMarkdown>{description}</ReactMarkdown>
 
-        {/* AI Hint Section */}
-        <div className="mt-8 pt-6 border-t border-border/60 not-prose">
-          <div className="bg-gradient-to-br from-indigo-500/5 to-violet-500/5 rounded-2xl border border-indigo-500/10 p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-                <h4 className="text-sm font-bold text-foreground">AI Conceptual Hints</h4>
-              </div>
-              {remainingHints !== null && (
-                <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full">
-                  {remainingHints} / 3 remaining today
-                </span>
-              )}
+          {/* Locked Hints Section */}
+          <div className="mt-8 pt-6 border-t border-border/60 not-prose space-y-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4.5 h-4.5 text-indigo-500 animate-pulse" />
+              <h4 className="text-sm font-bold text-foreground">Sequential Hints</h4>
             </div>
 
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Stuck on this problem? Ask Grok for a high-level conceptual hint. Grok will analyze
-              your current code and guide you without giving away the solution.
-            </p>
+            <div className="space-y-3">
+              {staticHints.map((hintText, idx) => {
+                const isUnlocked = unlockedHints[idx];
+                const isRevealed = revealedHints[idx];
+                const isPrevRevealed = idx === 0 || revealedHints[idx - 1];
 
-            {hint && (
-              <div className="bg-card/40 border border-indigo-500/20 rounded-xl p-4 text-xs text-foreground leading-relaxed shadow-sm relative group animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="absolute top-0 right-0 -mr-2 -mt-2 w-16 h-16 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
-                <span className="inline-block text-[9px] font-bold text-indigo-400 tracking-wider uppercase mb-1.5">
-                  Grok's Hint
-                </span>
-                <p className="font-medium text-foreground/90">{hint}</p>
-              </div>
-            )}
+                return (
+                  <div
+                    key={idx}
+                    className={cn(
+                      'border rounded-2xl p-4 transition-all duration-200 shadow-sm relative overflow-hidden',
+                      isUnlocked
+                        ? isRevealed
+                          ? 'bg-indigo-500/5 border-indigo-500/20 text-foreground'
+                          : 'bg-muted/30 border-border hover:border-zinc-400'
+                        : 'bg-muted/10 border-border/60 opacity-60',
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {isUnlocked ? (
+                          isRevealed ? (
+                            <Unlock size={14} className="text-indigo-500" />
+                          ) : (
+                            <Unlock size={14} className="text-zinc-500" />
+                          )
+                        ) : (
+                          <Lock size={14} className="text-muted-foreground/60" />
+                        )}
+                        <span className="text-xs font-bold">Hint {idx + 1}</span>
+                      </div>
 
-            {hintError && (
-              <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-xl p-3.5 text-xs font-semibold leading-relaxed flex items-center gap-2">
-                <span>{hintError}</span>
-              </div>
-            )}
+                      {isUnlocked && !isRevealed && (
+                        <Button
+                          type="button"
+                          onClick={() => handleReveal(idx)}
+                          size="sm"
+                          variant="secondary"
+                          className="h-7 text-[10px] font-bold rounded-lg flex items-center gap-1 active:scale-95 transition-all"
+                        >
+                          <Eye size={12} />
+                          Reveal Hint
+                        </Button>
+                      )}
+                    </div>
 
-            <div className="flex justify-end pt-1">
-              <Button
-                type="button"
-                onClick={handleFetchHint}
-                disabled={isHintLoading || (remainingHints !== null && remainingHints <= 0)}
-                size="sm"
-                className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md active:scale-95 transition-all flex items-center gap-1.5"
-              >
-                {isHintLoading ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Generating Hint...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Get AI Hint
-                  </>
-                )}
-              </Button>
+                    {isUnlocked && isRevealed && (
+                      <div className="mt-2 text-xs leading-relaxed text-muted-foreground animate-in fade-in duration-300">
+                        <p>{hintText}</p>
+
+                        {/* Show unlock next button if the next hint is locked */}
+                        {idx < 3 && !unlockedHints[idx + 1] && (
+                          <div className="mt-3 flex justify-end">
+                            <Button
+                              type="button"
+                              onClick={() => handleUnlockNext(idx)}
+                              size="sm"
+                              className="h-7 text-[10px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg active:scale-95 transition-all"
+                            >
+                              Unlock Hint {idx + 2}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {!isUnlocked && (
+                      <div className="mt-2 text-[11px] text-muted-foreground/60 flex items-center justify-between">
+                        <span>Locked</span>
+                        {isPrevRevealed ? (
+                          <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            Reveal previous hint to unlock
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground/40 italic">
+                            Prerequisites locked
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Solution Tab Content */}
+      {activeTab === 'solution' && (
+        <div className="flex-1 overflow-y-auto px-6 py-5 scrollbar-thin bg-card/5">
+          {solutionCode ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full select-none uppercase tracking-wider">
+                  Reference Solution Code
+                </span>
+              </div>
+              <pre className="p-4 bg-zinc-950/90 border border-border rounded-2xl text-xs font-mono text-zinc-200 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">
+                <code>{solutionCode}</code>
+              </pre>
+            </div>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground py-20 select-none">
+              <FileCode size={36} className="text-muted-foreground/50 mb-2" />
+              <p className="text-xs font-semibold">
+                No reference solution available for this challenge.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

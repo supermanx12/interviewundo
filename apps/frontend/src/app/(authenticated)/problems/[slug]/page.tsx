@@ -75,6 +75,7 @@ export default function ProblemWorkspacePage() {
         starterCode: string;
         solvedCount: number;
         attemptCount: number;
+        solutionCode?: string | null;
       }>(`/api/problems/${slug}`);
     },
   });
@@ -409,7 +410,12 @@ export default function ProblemWorkspacePage() {
             mobileTab === 'description' ? 'flex' : 'hidden md:flex',
           )}
         >
-          <ProblemDescriptionPanel description={problem.description} slug={slug} code={code} />
+          <ProblemDescriptionPanel
+            description={problem.description}
+            slug={slug}
+            code={code}
+            solutionCode={problem.solutionCode}
+          />
         </div>
 
         {/* Right Side: Editor & Output Panel */}

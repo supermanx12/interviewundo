@@ -8,10 +8,15 @@ import { ThemeToggle } from './ThemeToggle';
 import { Sidebar } from './Sidebar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Menu, Flame, Calendar, ChevronRight, Sparkles } from 'lucide-react';
+import { Menu, Flame, Calendar, ChevronRight, Sparkles, Terminal } from 'lucide-react';
 import Link from 'next/link';
 
-export function Header() {
+interface HeaderProps {
+  onMenuToggle?: () => void;
+  isSidebarOpen?: boolean;
+}
+
+export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
   const pathname = usePathname();
   const { user, apiFetch } = useAuth();
 
@@ -38,22 +43,32 @@ export function Header() {
   return (
     <header className="h-16 border-b border-border bg-background/50 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-40">
       <div className="flex items-center gap-4">
-        {/* Mobile Sidebar Hamburger Menu (Sheet) */}
-        <Sheet>
-          <SheetTrigger
-            render={
-              <Button variant="ghost" size="icon" className="md:hidden rounded-lg hover:bg-accent">
-                <Menu size={20} />
-              </Button>
-            }
-          />
-          <SheetContent side="left" className="p-0 w-64">
-            <Sidebar className="border-r-0" />
-          </SheetContent>
-        </Sheet>
+        {/* Unified Dropdown Menu Toggle Icon */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onMenuToggle}
+          className="rounded-lg hover:bg-accent/40 active:scale-95 transition-all"
+          aria-label="Toggle navigation menu"
+        >
+          <Menu size={20} />
+        </Button>
+
+        {/* Logo next to menu button */}
+        <div className="flex items-center gap-2">
+          <div className="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/10">
+            <Terminal size={15} />
+          </div>
+          <span className="font-bold tracking-tight text-sm bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent select-none">
+            CodePrep
+          </span>
+        </div>
+
+        <span className="w-px h-4 bg-border hidden sm:inline" />
 
         {/* Dynamic Title */}
-        <h1 className="font-semibold text-base md:text-lg tracking-tight text-foreground">
+        <h1 className="font-semibold text-xs md:text-sm tracking-tight text-muted-foreground">
           {getPageTitle()}
         </h1>
       </div>

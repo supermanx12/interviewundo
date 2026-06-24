@@ -1,6 +1,4 @@
-'use client';
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { FileCode, Terminal, Sparkles, Loader2, Play, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,14 +41,85 @@ export function ProblemEditorPanel({
   handleSubmitCode,
   category,
 }: ProblemEditorPanelProps) {
+  // Timer Local States
+  const [timerTime, setTimerTime] = useState<number>(0);
+  const [timerRunning, setTimerRunning] = useState<boolean>(false);
+  const [timerStarted, setTimerStarted] = useState<boolean>(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (timerRunning) {
+      interval = setInterval(() => {
+        setTimerTime((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timerRunning]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleStartPausePlay = () => {
+    if (!timerStarted) {
+      setTimerStarted(true);
+      setTimerRunning(true);
+    } else if (timerRunning) {
+      setTimerRunning(false);
+    } else {
+      setTimerRunning(true);
+    }
+  };
+
+  const handleReset = () => {
+    setTimerTime(0);
+    setTimerRunning(false);
+    setTimerStarted(false);
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-[#1e1e1e]">
       {/* Top Panel: Monaco Editor */}
       <div className="flex-1 flex flex-col min-h-0 relative">
         <div className="flex items-center justify-between px-6 py-2 border-b border-border bg-[#181818] shrink-0 text-xs font-semibold text-zinc-400 select-none">
-          <div className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-zinc-300">
-            <FileCode size={13} className="text-zinc-400" />
-            {editorConfig.filename}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-zinc-300">
+              <FileCode size={13} className="text-zinc-400" />
+              {editorConfig.filename}
+            </div>
+
+            {/* Timer Capsule UI */}
+            <div className="flex items-center gap-2.5 bg-[#252526] border border-zinc-800/80 px-3 py-1 rounded-lg text-zinc-300 font-mono text-[10px]">
+              <span className="text-emerald-400 font-bold tracking-tight select-none w-10 text-center">
+                {formatTime(timerTime)}
+              </span>
+              <span className="w-px h-3 bg-zinc-800" />
+              <button
+                type="button"
+                onClick={handleStartPausePlay}
+                className={cn(
+                  'font-bold transition-all px-1.5 py-0.5 rounded cursor-pointer',
+                  !timerStarted
+                    ? 'text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10'
+                    : timerRunning
+                      ? 'text-amber-500 hover:text-amber-400 hover:bg-amber-500/10'
+                      : 'text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10',
+                )}
+              >
+                {!timerStarted ? 'Start' : timerRunning ? 'Pause' : 'Play'}
+              </button>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 font-bold transition-all px-1.5 py-0.5 rounded cursor-pointer"
+              >
+                Reset
+              </button>
+            </div>
           </div>
 
           <div className="bg-[#2a2a2a]/60 border border-zinc-800/80 px-2.5 py-1 rounded text-zinc-400 font-mono text-[9px] select-none uppercase tracking-wider font-extrabold">

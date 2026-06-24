@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/providers';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Code2, History, User, Shield, LogOut, Terminal } from 'lucide-react';
+import { LayoutDashboard, Code2, History, User, Shield, LogOut, Terminal, X } from 'lucide-react';
 
 interface SidebarProps {
   className?: string;
   onLinkClick?: () => void;
+  onClose?: () => void;
 }
 
 const navItems = [
@@ -35,7 +36,7 @@ const navItems = [
   },
 ];
 
-export function Sidebar({ className, onLinkClick }: SidebarProps) {
+export function Sidebar({ className, onLinkClick, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
@@ -49,13 +50,26 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
       )}
     >
       {/* Brand Logo Header */}
-      <div className="h-16 px-6 border-b border-border flex items-center gap-2.5">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/10">
-          <Terminal size={18} className="animate-pulse" />
+      <div className="h-16 px-6 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/10">
+            <Terminal size={18} className="animate-pulse" />
+          </div>
+          <span className="font-bold tracking-tight text-lg bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+            CodePrep
+          </span>
         </div>
-        <span className="font-bold tracking-tight text-lg bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-          CodePrep
-        </span>
+
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/40 active:scale-95 transition-all cursor-pointer"
+            aria-label="Close sidebar"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
