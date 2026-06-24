@@ -1,8 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { FileCode, Terminal, Sparkles, Loader2, Play, Send } from 'lucide-react';
+import { FileCode, Terminal, Sparkles, Loader2, Play, Send, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {}
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/85 transition-all active:scale-90 cursor-pointer flex items-center justify-center border-none bg-transparent"
+      title="Copy to clipboard"
+    >
+      {copied ? (
+        <Check size={13} className="text-emerald-500 animate-in zoom-in duration-200" />
+      ) : (
+        <Copy size={13} />
+      )}
+    </button>
+  );
+}
 
 interface ProblemEditorPanelProps {
   code: string;
@@ -116,6 +142,7 @@ export function ProblemEditorPanel({
               <span className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-widest font-mono">
                 schema.sql
               </span>
+              <CopyButton text={formattedSql} />
             </div>
             <pre className="p-4 text-zinc-200 whitespace-pre-wrap overflow-x-auto text-[11px] font-mono leading-relaxed select-text bg-[#151515]/20">
               <code>{formattedSql}</code>
@@ -146,6 +173,7 @@ export function ProblemEditorPanel({
                     <span className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-widest font-mono">
                       seed.js
                     </span>
+                    <CopyButton text={commands.join('\n\n')} />
                   </div>
                   <pre className="p-4 text-zinc-200 whitespace-pre-wrap overflow-x-auto text-[11px] font-mono leading-relaxed select-text bg-[#151515]/20">
                     <code>{commands.join('\n\n')}</code>
@@ -160,6 +188,7 @@ export function ProblemEditorPanel({
                 <span className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-widest font-mono">
                   seed.json
                 </span>
+                <CopyButton text={JSON.stringify(parsed, null, 2)} />
               </div>
               <pre className="p-4 text-zinc-200 whitespace-pre-wrap overflow-x-auto text-[11px] font-mono leading-relaxed select-text bg-[#151515]/20">
                 <code>{JSON.stringify(parsed, null, 2)}</code>
@@ -168,9 +197,17 @@ export function ProblemEditorPanel({
           );
         }
         return (
-          <pre className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-2xl text-zinc-200 select-text">
-            <code>{inputStr}</code>
-          </pre>
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950/40 overflow-hidden shadow-sm">
+            <div className="bg-zinc-900/60 px-4 py-2 border-b border-zinc-800/40 flex items-center justify-between select-none">
+              <span className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-widest font-mono">
+                input
+              </span>
+              <CopyButton text={inputStr} />
+            </div>
+            <pre className="p-4 text-zinc-200 whitespace-pre-wrap overflow-x-auto text-[11px] font-mono leading-relaxed select-text bg-[#151515]/20">
+              <code>{inputStr}</code>
+            </pre>
+          </div>
         );
       }
 
@@ -192,6 +229,7 @@ export function ProblemEditorPanel({
                   <span className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-widest font-mono">
                     Argument {argIdx + 1}
                   </span>
+                  <CopyButton text={JSON.stringify(arg, null, 2)} />
                 </div>
                 <pre className="p-4 text-zinc-200 text-[11px] font-mono overflow-x-auto leading-relaxed bg-[#151515]/20">
                   <code>{JSON.stringify(arg, null, 2)}</code>
@@ -203,15 +241,31 @@ export function ProblemEditorPanel({
       }
 
       return (
-        <pre className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-2xl text-zinc-200 select-text">
-          <code>{inputStr}</code>
-        </pre>
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/40 overflow-hidden shadow-sm">
+          <div className="bg-zinc-900/60 px-4 py-2 border-b border-zinc-800/40 flex items-center justify-between select-none">
+            <span className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-widest font-mono">
+              input
+            </span>
+            <CopyButton text={inputStr} />
+          </div>
+          <pre className="p-4 text-zinc-200 whitespace-pre-wrap overflow-x-auto text-[11px] font-mono leading-relaxed select-text bg-[#151515]/20">
+            <code>{inputStr}</code>
+          </pre>
+        </div>
       );
     } catch (err) {
       return (
-        <pre className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-2xl text-zinc-200 select-text">
-          <code>{inputStr}</code>
-        </pre>
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/40 overflow-hidden shadow-sm">
+          <div className="bg-zinc-900/60 px-4 py-2 border-b border-zinc-800/40 flex items-center justify-between select-none">
+            <span className="text-[9px] text-zinc-500 font-extrabold uppercase tracking-widest font-mono">
+              input
+            </span>
+            <CopyButton text={inputStr} />
+          </div>
+          <pre className="p-4 text-zinc-200 whitespace-pre-wrap overflow-x-auto text-[11px] font-mono leading-relaxed select-text bg-[#151515]/20">
+            <code>{inputStr}</code>
+          </pre>
+        </div>
       );
     }
   };
@@ -235,6 +289,7 @@ export function ProblemEditorPanel({
               <span className="text-[9px] text-emerald-500 font-extrabold uppercase tracking-widest font-mono">
                 Expected Rows
               </span>
+              <CopyButton text={expectedStr} />
             </div>
             <div className="overflow-x-auto scrollbar-thin">
               <table className="min-w-full divide-y divide-zinc-800 font-mono text-[11px] table-auto">
@@ -298,6 +353,7 @@ export function ProblemEditorPanel({
               <span className="text-[9px] text-emerald-500 font-extrabold uppercase tracking-widest font-mono">
                 Expected Result
               </span>
+              <CopyButton text={JSON.stringify(parsed, null, 2)} />
             </div>
             <pre className="p-4 text-zinc-200 text-[11px] font-mono overflow-x-auto leading-relaxed bg-[#151515]/20">
               <code>{JSON.stringify(parsed, null, 2)}</code>
@@ -312,6 +368,7 @@ export function ProblemEditorPanel({
             <span className="text-[9px] text-emerald-500 font-extrabold uppercase tracking-widest font-mono">
               Expected Result
             </span>
+            <CopyButton text={String(parsed)} />
           </div>
           <pre className="p-4 text-zinc-200 text-[11px] font-mono bg-[#151515]/20">
             <code>{String(parsed)}</code>
@@ -320,9 +377,17 @@ export function ProblemEditorPanel({
       );
     } catch (err) {
       return (
-        <pre className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-2xl text-zinc-200 text-[11px] font-mono select-text">
-          <code>{expectedStr}</code>
-        </pre>
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/40 overflow-hidden shadow-sm select-text">
+          <div className="bg-zinc-900/60 px-4 py-2.5 border-b border-zinc-800/40 flex items-center justify-between select-none">
+            <span className="text-[9px] text-emerald-500 font-extrabold uppercase tracking-widest font-mono">
+              Expected Result
+            </span>
+            <CopyButton text={expectedStr} />
+          </div>
+          <pre className="p-4 text-zinc-200 text-[11px] font-mono bg-[#151515]/20">
+            <code>{expectedStr}</code>
+          </pre>
+        </div>
       );
     }
   };
@@ -336,6 +401,7 @@ export function ProblemEditorPanel({
             <div className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-zinc-300">
               <FileCode size={13} className="text-zinc-400" />
               {editorConfig.filename}
+              <CopyButton text={code} />
             </div>
 
             {/* Timer Capsule UI */}
@@ -535,7 +601,7 @@ export function ProblemEditorPanel({
                 </div>
               ) : consoleOutput ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 select-none">
+                  <div className="flex items-center justify-between select-none">
                     <span
                       className={cn(
                         'px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider uppercase',
@@ -549,9 +615,10 @@ export function ProblemEditorPanel({
                     >
                       {consoleOutput.status}
                     </span>
+                    <CopyButton text={consoleOutput.stdout || consoleOutput.error || ''} />
                   </div>
                   <pre className="p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                    {consoleOutput.stdout}
+                    {consoleOutput.stdout || consoleOutput.error}
                   </pre>
                 </div>
               ) : (

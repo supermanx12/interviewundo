@@ -4,10 +4,47 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { BookOpen, History, Sparkles, FileCode, Lock, Unlock, Eye, X } from 'lucide-react';
+import {
+  BookOpen,
+  History,
+  Sparkles,
+  FileCode,
+  Lock,
+  Unlock,
+  Eye,
+  X,
+  Copy,
+  Check,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/providers';
 import { cn } from '@/lib/utils';
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {}
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/80 transition-all active:scale-90 cursor-pointer flex items-center justify-center border-none bg-transparent"
+      title="Copy to clipboard"
+    >
+      {copied ? (
+        <Check size={13} className="text-emerald-500 animate-in zoom-in duration-200" />
+      ) : (
+        <Copy size={13} />
+      )}
+    </button>
+  );
+}
 
 interface ProblemDescriptionPanelProps {
   description: string;
@@ -207,6 +244,7 @@ export function ProblemDescriptionPanel({
                 <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full select-none uppercase tracking-wider">
                   Reference Solution Code
                 </span>
+                <CopyButton text={solutionCode} />
               </div>
               <pre className="p-4 bg-zinc-950/90 border border-border rounded-2xl text-xs font-mono text-zinc-200 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">
                 <code>{solutionCode}</code>
