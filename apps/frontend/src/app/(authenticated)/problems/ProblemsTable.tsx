@@ -13,6 +13,7 @@ interface Problem {
   category: string;
   solvedCount: number;
   attemptCount: number;
+  tags?: string[];
 }
 
 interface ProblemsTableProps {
@@ -134,12 +135,26 @@ export function ProblemsTable({
 
                   {/* Title & Slug link */}
                   <td className="py-4.5 px-6 font-semibold text-foreground">
-                    <Link
-                      href={`/problems/${prob.slug}`}
-                      className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                    >
-                      {prob.title}
-                    </Link>
+                    <div className="flex flex-col gap-1.5">
+                      <Link
+                        href={`/problems/${prob.slug}`}
+                        className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                      >
+                        {prob.title}
+                      </Link>
+                      {prob.tags && prob.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {prob.tags.map((t) => (
+                            <span
+                              key={t}
+                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 capitalize"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </td>
 
                   {/* Difficulty badge */}

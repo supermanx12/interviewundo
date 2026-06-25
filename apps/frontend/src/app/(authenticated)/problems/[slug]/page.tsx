@@ -75,6 +75,7 @@ export default function ProblemWorkspacePage() {
         starterCode: string;
         solvedCount: number;
         attemptCount: number;
+        tags?: string[];
         solutionCode?: string | null;
         testCases?: Array<{
           id: string;
@@ -336,6 +337,18 @@ export default function ProblemWorkspacePage() {
             {problem.title}
           </h1>
           <DifficultyBadge difficulty={problem.difficulty} />
+          {problem.tags && problem.tags.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {problem.tags.map((t) => (
+                <span
+                  key={t}
+                  className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 capitalize"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Editor Controls */}
@@ -422,6 +435,7 @@ export default function ProblemWorkspacePage() {
             slug={slug}
             code={code}
             solutionCode={problem.solutionCode}
+            tags={problem.tags}
           />
         </div>
 

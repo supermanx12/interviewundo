@@ -107,6 +107,12 @@ export class PrismaProblemRepository implements IProblemRepository {
       where.difficulty = filters.difficulty;
     }
 
+    if (filters.tag) {
+      where.tags = {
+        has: filters.tag,
+      };
+    }
+
     if (filters.search) {
       where.OR = [
         { title: { contains: filters.search, mode: 'insensitive' } },

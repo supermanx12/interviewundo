@@ -21,6 +21,15 @@ const categories = [
   { value: 'MONGODB', label: 'MongoDB' },
 ] as const;
 
+const conceptTags = [
+  { value: 'ALL', label: 'All Concepts' },
+  { value: 'arrays', label: 'Arrays' },
+  { value: 'strings', label: 'Strings' },
+  { value: 'objects', label: 'Objects' },
+  { value: 'loops', label: 'Loops' },
+  { value: 'functions', label: 'Functions' },
+] as const;
+
 export default function ProblemsPage() {
   const { apiFetch } = useAuth();
 
@@ -30,6 +39,7 @@ export default function ProblemsPage() {
   const [category, setCategory] = useState<
     'ALL' | 'JAVASCRIPT' | 'REACT' | 'NODEJS' | 'TYPESCRIPT' | 'SQL' | 'MONGODB'
   >('ALL');
+  const [tag, setTag] = useState<string>('ALL');
   const [difficulty, setDifficulty] = useState<'ALL' | 'EASY' | 'MEDIUM' | 'HARD'>('ALL');
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -46,11 +56,12 @@ export default function ProblemsPage() {
 
   // Fetch problems using React Query
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['problems', { search: debouncedSearch, category, difficulty, page }],
+    queryKey: ['problems', { search: debouncedSearch, category, tag, difficulty, page }],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (category !== 'ALL') params.set('category', category);
+      if (tag !== 'ALL') params.set('tag', tag);
       if (difficulty !== 'ALL') params.set('difficulty', difficulty);
       params.set('page', page.toString());
       params.set('limit', limit.toString());
@@ -64,6 +75,7 @@ export default function ProblemsPage() {
           category: string;
           solvedCount: number;
           attemptCount: number;
+          tags?: string[];
         }>;
         total: number;
         page: number;
@@ -76,6 +88,7 @@ export default function ProblemsPage() {
   const handleReset = () => {
     setSearch('');
     setCategory('ALL');
+    setTag('ALL');
     setDifficulty('ALL');
     setPage(1);
   };
@@ -126,7 +139,7 @@ export default function ProblemsPage() {
             </div>
 
             {/* Reset Button */}
-            {(search || category !== 'ALL' || difficulty !== 'ALL') && (
+            {(search || category !== 'ALL' || tag !== 'ALL' || difficulty !== 'ALL') && (
               <Button
                 variant="ghost"
                 className="h-11 px-4 rounded-xl border border-border/80 text-muted-foreground hover:text-foreground font-semibold flex items-center gap-2 hover:bg-accent/40 active:scale-95 transition-all"
@@ -138,29 +151,66 @@ export default function ProblemsPage() {
             )}
           </div>
 
-          {/* Topic Chips Navigation */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-            {categories.map((cat) => {
-              const isActive = category === cat.value;
-              return (
-                <button
-                  key={cat.value}
-                  type="button"
-                  onClick={() => {
-                    setCategory(cat.value);
-                    setPage(1);
-                  }}
-                  className={cn(
-                    'px-4 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all active:scale-95 border cursor-pointer select-none',
-                    isActive
-                      ? 'bg-primary text-primary-foreground border-transparent shadow-sm'
-                      : 'bg-background/40 hover:bg-accent/50 text-muted-foreground border-border',
-                  )}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
+          <div className="space-y-3">
+            {/* Topic Chips Navigation */}
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/80 px-1">
+                Categories
+              </span>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                {categories.map((cat) => {
+                  const isActive = category === cat.value;
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => {
+                        setCategory(cat.value);
+                        setPage(1);
+                      }}
+                      className={cn(
+                        'px-4 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all active:scale-95 border cursor-pointer select-none',
+                        isActive
+                          ? 'bg-primary text-primary-foreground border-transparent shadow-sm'
+                          : 'bg-background/40 hover:bg-accent/50 text-muted-foreground border-border',
+                      )}
+                    >
+                      {cat.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Concept Tag Chips Navigation */}
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/80 px-1">
+                Concepts
+              </span>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                {conceptTags.map((t) => {
+                  const isActive = tag === t.value;
+                  return (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => {
+                        setTag(t.value);
+                        setPage(1);
+                      }}
+                      className={cn(
+                        'px-4 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all active:scale-95 border cursor-pointer select-none',
+                        isActive
+                          ? 'bg-indigo-600 dark:bg-indigo-500 text-white border-transparent shadow-sm'
+                          : 'bg-background/40 hover:bg-accent/50 text-muted-foreground border-border',
+                      )}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

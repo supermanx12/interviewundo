@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useQuery } from '@tanstack/react-query';
 import {
   BookOpen,
   History,
@@ -17,7 +18,7 @@ import {
   Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/providers';
+import { useToast, useAuth } from '@/providers';
 import { cn } from '@/lib/utils';
 
 function CopyButton({ text }: { text: string }) {
@@ -51,6 +52,7 @@ interface ProblemDescriptionPanelProps {
   slug: string;
   code: string;
   solutionCode?: string | null;
+  tags?: string[];
 }
 
 const staticHints = [
@@ -64,11 +66,26 @@ export function ProblemDescriptionPanel({
   description,
   slug,
   solutionCode,
+  tags,
 }: ProblemDescriptionPanelProps) {
   const { success: showSuccess } = useToast();
+  const { apiFetch } = useAuth();
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<'description' | 'solution'>('description');
+  const [activeTab, setActiveTab] = useState<'description' | 'solution' | 'related'>('description');
+
+  const firstTag = tags && tags.length > 0 ? tags[0] : null;
+
+  const { data: relatedData } = useQuery({
+    queryKey: ['related-problems', firstTag],
+    queryFn: async () => {
+      if (!firstTag) return { data: [] };
+      return apiFetch<{
+        data: Array<{ id: string; title: string; slug: string; difficulty: string }>;
+      }>(`/api/problems?tag=${firstTag}&limit=5`);
+    },
+    enabled: !!firstTag,
+  });
 
   // Hints Progression State
   const [unlockedHints, setUnlockedHints] = useState<boolean[]>([true, false, false, false]);
@@ -125,6 +142,21 @@ export function ProblemDescriptionPanel({
             <FileCode size={13} />
             Solution
           </button>
+          {firstTag && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('related')}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border-none',
+                activeTab === 'related'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Sparkles size={13} />
+              Related
+            </button>
+          )}
         </div>
         <Link
           href="/submissions"
@@ -258,6 +290,43 @@ export function ProblemDescriptionPanel({
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Related Tab Content */}
+      {activeTab === 'related' && (
+        <div className="flex-1 overflow-y-auto px-6 py-5 scrollbar-thin bg-card/5 space-y-4">
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80">
+              Problems tagged with "{firstTag}"
+            </h4>
+            {relatedData &&
+            relatedData.data &&
+            relatedData.data.filter((p) => p.slug !== slug).length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {relatedData.data
+                  .filter((p) => p.slug !== slug)
+                  .map((p) => (
+                    <Link
+                      key={p.id}
+                      href={`/problems/${p.slug}`}
+                      className="flex items-center justify-between p-3 border border-border hover:border-zinc-400 bg-background/40 hover:bg-accent/30 rounded-xl transition-all duration-150 group"
+                    >
+                      <span className="text-xs font-semibold text-foreground group-hover:text-indigo-500 transition-colors">
+                        {p.title}
+                      </span>
+                      <span className="text-[10px] font-bold text-muted-foreground capitalize">
+                        {p.difficulty.toLowerCase()}
+                      </span>
+                    </Link>
+                  ))}
+              </div>
+            ) : (
+              <div className="py-8 text-center text-xs text-muted-foreground">
+                No other similar problems found.
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
