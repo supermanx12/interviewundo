@@ -20,6 +20,7 @@
     "db:migrate": "npm run migrate:dev --workspace=apps/backend-api",
     "db:seed": "npm run seed --workspace=apps/backend-api",
     "db:seed:arrays": "npm run db:seed:arrays --workspace=apps/backend-api",
+    "db:seed:other-js": "npm run db:seed:other-js --workspace=apps/backend-api",
     "db:studio": "npm run studio --workspace=apps/backend-api",
     "prepare": "husky"
   },
