@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <div className="flex flex-col">
             <span className="font-bold tracking-tight text-sm leading-none bg-gradient-to-r from-rose-500 to-amber-500 bg-clip-text text-transparent">
-              CodePrep
+              interviewUndo
             </span>
             <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
               Admin Console

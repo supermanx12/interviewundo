@@ -5,7 +5,7 @@ export function Navbar() {
     <nav className="relative z-50 flex items-center justify-between px-6 py-4 max-w-[1200px] mx-auto w-full">
       <div className="flex items-center gap-12">
         <Link href="/" className="text-fey-white text-lg font-bold tracking-[-0.053em]">
-          InterviewPrep
+          interviewUndo
         </Link>
         <div className="hidden md:flex items-center gap-1 bg-[#191919] rounded-full p-1 border border-white/5">
           <Link

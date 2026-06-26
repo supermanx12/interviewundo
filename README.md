@@ -1,6 +1,6 @@
-# InterviewPrep Platform
+# interviewUndo Platform
 
-InterviewPrep is a LeetCode-style interview practice platform focused on JavaScript, React, Node.js, and TypeScript. It combines a modern Next.js frontend, a clean-architecture Express API, and a judge worker that executes user code inside sandboxed Docker containers.
+interviewUndo is a LeetCode-style interview practice platform focused on JavaScript, React, Node.js, and TypeScript. It combines a modern Next.js frontend, a clean-architecture Express API, and a judge worker that executes user code inside sandboxed Docker containers.
 
 ## Highlights
 

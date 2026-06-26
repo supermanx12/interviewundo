@@ -53,7 +53,7 @@ export default function LoginForm() {
       <div className="pt-10 pb-6 px-8 text-center flex flex-col items-center">
         <h1 className="text-2xl font-bold tracking-[-0.05em] text-[#ffffff] mb-2">Welcome back</h1>
         <p className="text-[#868f97] text-sm">
-          Sign in to your CodePrep account to continue solving
+          Sign in to your interviewUndo account to continue solving
         </p>
       </div>
 

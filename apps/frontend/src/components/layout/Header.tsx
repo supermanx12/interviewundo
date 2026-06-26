@@ -61,7 +61,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
             <Terminal size={15} />
           </div>
           <span className="font-bold tracking-tight text-sm bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent select-none">
-            CodePrep
+            interviewUndo
           </span>
         </div>
 

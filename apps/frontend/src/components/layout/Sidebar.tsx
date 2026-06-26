@@ -56,7 +56,7 @@ export function Sidebar({ className, onLinkClick, onClose }: SidebarProps) {
             <Terminal size={18} className="animate-pulse" />
           </div>
           <span className="font-bold tracking-tight text-lg bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-            CodePrep
+            interviewUndo
           </span>
         </div>
 

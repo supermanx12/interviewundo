@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import LoginForm from './LoginForm';
 
 export const metadata: Metadata = {
-  title: 'Sign In — CodePrep',
+  title: 'Sign In — interviewUndo',
   description:
-    'Sign in to your CodePrep account to continue practicing coding challenges and technical interviews.',
+    'Sign in to your interviewUndo account to continue practicing coding challenges and technical interviews.',
 };
 
 export default function LoginPage() {

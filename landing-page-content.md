@@ -1,4 +1,4 @@
-# InterviewPrep Landing Page Content
+# interviewUndo Landing Page Content
 
 ---
 
@@ -6,7 +6,7 @@
 
 ## Logo
 
-**InterviewPrep**
+**interviewUndo**
 
 ## Navigation
 

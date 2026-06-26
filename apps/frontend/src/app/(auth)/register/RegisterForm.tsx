@@ -42,7 +42,7 @@ export default function RegisterForm() {
     setIsSubmitting(true);
     try {
       await registerUser(data);
-      showSuccess('Account created successfully! Welcome to CodePrep.');
+      showSuccess('Account created successfully! Welcome to interviewUndo.');
       router.push('/dashboard');
     } catch (err: any) {
       const errMsg = err.message || 'Registration failed. Email might already be in use.';
@@ -60,7 +60,7 @@ export default function RegisterForm() {
           Create an account
         </h1>
         <p className="text-[#868f97] text-sm">
-          Join CodePrep to practice challenges and master tech interviews
+          Join interviewUndo to practice challenges and master tech interviews
         </p>
       </div>
 
