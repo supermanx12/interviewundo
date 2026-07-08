@@ -31,6 +31,9 @@ const envSchema = z.object({
   // Grok API (xAI)
   GROK_API_KEY: z.string().optional(),
   GROK_MODEL: z.string().default('grok-2'),
+
+  // Shared secret for server-to-server NextAuth webhook/API endpoints security
+  AUTH_SHARED_SECRET: z.string().min(16),
 });
 
 export type Env = z.infer<typeof envSchema>;

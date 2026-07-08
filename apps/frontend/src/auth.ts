@@ -23,6 +23,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'x-auth-shared-secret': process.env.AUTH_SHARED_SECRET || '',
             },
             body: JSON.stringify({
               githubId: profile.id?.toString() || user?.id,
@@ -56,6 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'x-auth-shared-secret': process.env.AUTH_SHARED_SECRET || '',
             },
             body: JSON.stringify({
               googleId: profile.sub || user?.id,

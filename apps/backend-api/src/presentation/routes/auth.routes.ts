@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { container } from '../../container';
 import { validateRequest } from '../middleware/validate-request';
+import { validateSharedSecret } from '../middleware/validate-shared-secret';
 import { RegisterSchema, LoginSchema } from '@interviewprep/shared-types';
 
 // ============================================================
@@ -34,9 +35,14 @@ const GithubAuthSchema = z.object({
   image: z.string().nullable().optional(),
 });
 
-authRoutes.post('/github', validateRequest(GithubAuthSchema), (req, res, next) => {
-  container.controllers.authController.githubLogin(req, res, next);
-});
+authRoutes.post(
+  '/github',
+  validateSharedSecret,
+  validateRequest(GithubAuthSchema),
+  (req, res, next) => {
+    container.controllers.authController.githubLogin(req, res, next);
+  },
+);
 
 const GoogleAuthSchema = z.object({
   googleId: z.string().min(1, 'Google ID is required'),
@@ -45,8 +51,13 @@ const GoogleAuthSchema = z.object({
   image: z.string().nullable().optional(),
 });
 
-authRoutes.post('/google', validateRequest(GoogleAuthSchema), (req, res, next) => {
-  container.controllers.authController.googleLogin(req, res, next);
-});
+authRoutes.post(
+  '/google',
+  validateSharedSecret,
+  validateRequest(GoogleAuthSchema),
+  (req, res, next) => {
+    container.controllers.authController.googleLogin(req, res, next);
+  },
+);
 
 export { authRoutes };

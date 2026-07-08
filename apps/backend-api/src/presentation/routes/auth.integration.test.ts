@@ -63,4 +63,62 @@ describe('Auth Flow End-to-End Integration', () => {
     expect(loginRes.body.success).toBe(false);
     expect(loginRes.body.error.message).toBe('Invalid email or password');
   });
+
+  describe('OAuth endpoints verification', () => {
+    const oauthEmail = 'oauth-test@example.com';
+
+    afterAll(async () => {
+      await prisma.user.deleteMany({
+        where: { email: oauthEmail },
+      });
+    });
+
+    it('should fail with 401 when x-auth-shared-secret is missing', async () => {
+      const res = await request(app).post('/api/auth/github').send({
+        githubId: 'git-123',
+        email: oauthEmail,
+        name: 'OAuth User',
+      });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('Shared secret invalid or missing');
+    });
+
+    it('should fail with 401 when x-auth-shared-secret is invalid', async () => {
+      const res = await request(app)
+        .post('/api/auth/github')
+        .set('x-auth-shared-secret', 'wrong-secret-key-123')
+        .send({
+          githubId: 'git-123',
+          email: oauthEmail,
+          name: 'OAuth User',
+        });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('Shared secret invalid or missing');
+    });
+
+    it('should register a new user when x-auth-shared-secret is correct', async () => {
+      const res = await request(app)
+        .post('/api/auth/github')
+        .set(
+          'x-auth-shared-secret',
+          process.env.AUTH_SHARED_SECRET || 'super-secret-shared-key-for-oauth-sync-1234567890',
+        )
+        .send({
+          githubId: 'git-123',
+          email: oauthEmail,
+          name: 'OAuth User',
+          image: 'https://avatar.com/u',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveProperty('accessToken');
+      expect(res.body.data.user.email).toBe(oauthEmail);
+      expect(res.body.data.user.image).toBe('https://avatar.com/u');
+    });
+  });
 });

@@ -24,7 +24,8 @@
         "JWT_ACCESS_SECRET",
         "JWT_REFRESH_SECRET",
         "PORT",
-        "NODE_ENV"
+        "NODE_ENV",
+        "AUTH_SHARED_SECRET"
       ]
     },
     "test:e2e": {
