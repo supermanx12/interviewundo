@@ -9,7 +9,7 @@ import { StreakNotificationListener } from './StreakNotificationListener';
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const pathname = usePathname();
-  const showPermanentSidebar = pathname.startsWith('/problems');
+  const showPermanentSidebar = pathname === '/problems';
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background relative">
