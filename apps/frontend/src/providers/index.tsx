@@ -6,6 +6,7 @@ import { AuthProvider } from './AuthProvider';
 import { QueryProvider } from './QueryProvider';
 import { ThemeProvider } from './ThemeProvider';
 import { SocketProvider } from './SocketProvider';
+import { KeepAliveProvider } from './KeepAliveProvider';
 import { ToastProvider } from './ToastProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <QueryProvider>
           <AuthProvider>
             <ToastProvider>
-              <SocketProvider>{children}</SocketProvider>
+              <SocketProvider>
+                <KeepAliveProvider>{children}</KeepAliveProvider>
+              </SocketProvider>
             </ToastProvider>
           </AuthProvider>
         </QueryProvider>
