@@ -14,6 +14,11 @@ import { DifficultyBadge } from '@/components/ui/difficulty-badge';
 import { DifficultyProgress } from './DifficultyProgress';
 import { RecentSubmissions } from './RecentSubmissions';
 import { ActivityHeatmap } from './ActivityHeatmap';
+import { QuickActions } from './QuickActions';
+import { WeeklyGoal } from './WeeklyGoal';
+import { InterviewReadiness } from './InterviewReadiness';
+import { StrongTopics } from './StrongTopics';
+import { Achievements } from './Achievements';
 
 // ============================================================
 // Types
@@ -182,6 +187,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Quick Actions */}
+      <QuickActions />
+
       {/* Daily Challenge Banner */}
       {isDailyLoading ? (
         <div className="w-full bg-[#131313] border border-white/5 rounded-[16px] p-6 md:p-8 animate-pulse space-y-4">
@@ -294,6 +302,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left Side: Stats Breakdown & Category Progress Chart */}
         <div className="lg:col-span-2 space-y-6">
+          <InterviewReadiness />
+
           {/* Difficulty breakdown */}
           <DifficultyProgress difficultyBreakdown={stats.difficultyBreakdown} />
 
@@ -352,10 +362,16 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             </CardContent>
           </Card>
+
+          {/* Achievements */}
+          <Achievements />
         </div>
 
         {/* Right Side: Heatmap Calendar & Recent Submissions */}
         <div className="space-y-6">
+          <WeeklyGoal />
+          <StrongTopics />
+
           {/* Submission Heatmap */}
           <ActivityHeatmap activity={data.activity} />
 
