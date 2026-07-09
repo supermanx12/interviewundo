@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { BookOpen, History, Sparkles, Loader2, Play, Send } from 'lucide-react';
+import { BookOpen, History, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth, useToast } from '@/providers';
 
@@ -12,20 +12,12 @@ interface ReactWorkspaceDescriptionPanelProps {
   description: string;
   slug: string;
   code: string;
-  handleRunCode?: () => void;
-  handleSubmitCode?: () => void;
-  isRunning?: boolean;
-  isSubmitting?: boolean;
 }
 
 export function ReactWorkspaceDescriptionPanel({
   description,
   slug,
   code,
-  handleRunCode,
-  handleSubmitCode,
-  isRunning,
-  isSubmitting,
 }: ReactWorkspaceDescriptionPanelProps) {
   const { apiFetch } = useAuth();
   const { success: showSuccess, error: showError } = useToast();
@@ -62,48 +54,13 @@ export function ReactWorkspaceDescriptionPanel({
           Problem Description
         </div>
 
-        <div className="flex items-center gap-3">
-          {handleRunCode && handleSubmitCode && (
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={handleRunCode}
-                disabled={isRunning || isSubmitting}
-                className="h-8 px-2.5 rounded-lg border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800 text-[11px] font-bold active:scale-95 transition-all"
-              >
-                {isRunning ? (
-                  <Loader2 size={12} className="animate-spin mr-1" />
-                ) : (
-                  <Play size={11} className="mr-1 fill-current text-zinc-400" />
-                )}
-                Run Code
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleSubmitCode}
-                disabled={isRunning || isSubmitting}
-                className="h-8 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-extrabold active:scale-95 shadow-sm transition-all border-transparent"
-              >
-                {isSubmitting ? (
-                  <Loader2 size={12} className="animate-spin mr-1" />
-                ) : (
-                  <Send size={11} className="mr-1" />
-                )}
-                Submit
-              </Button>
-            </div>
-          )}
-          <Link
-            href="/submissions"
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 active:scale-95 transition-all"
-          >
-            <History size={12} />
-            History
-          </Link>
-        </div>
+        <Link
+          href="/submissions"
+          className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 active:scale-95 transition-all"
+        >
+          <History size={12} />
+          History
+        </Link>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-5 prose prose-indigo dark:prose-invert max-w-none text-sm text-zinc-300 scrollbar-thin">
@@ -118,8 +75,8 @@ export function ReactWorkspaceDescriptionPanel({
             </div>
 
             <p className="text-[11px] text-zinc-400 leading-relaxed">
-              Stuck on this component's logic or event handling? Let the AI analyze your active file
-              and provide a conceptual hint.
+              Stuck on this component&apos;s logic or event handling? Let the AI analyze your active
+              file and provide a conceptual hint.
             </p>
 
             {hint && (

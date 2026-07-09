@@ -16,9 +16,6 @@ import {
   X,
   Copy,
   Check,
-  Play,
-  Send,
-  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast, useAuth } from '@/providers';
@@ -56,10 +53,6 @@ interface ProblemDescriptionPanelProps {
   code: string;
   solutionCode?: string | null;
   tags?: string[];
-  handleRunCode?: () => void;
-  handleSubmitCode?: () => void;
-  isRunning?: boolean;
-  isSubmitting?: boolean;
 }
 
 const staticHints = [
@@ -74,10 +67,6 @@ export function ProblemDescriptionPanel({
   slug,
   solutionCode,
   tags,
-  handleRunCode,
-  handleSubmitCode,
-  isRunning,
-  isSubmitting,
 }: ProblemDescriptionPanelProps) {
   const { success: showSuccess } = useToast();
   const { apiFetch } = useAuth();
@@ -170,48 +159,13 @@ export function ProblemDescriptionPanel({
           )}
         </div>
 
-        <div className="flex items-center gap-3">
-          {handleRunCode && handleSubmitCode && (
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={handleRunCode}
-                disabled={isRunning || isSubmitting}
-                className="h-8 px-2.5 rounded-lg border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800 text-[11px] font-bold active:scale-95 transition-all"
-              >
-                {isRunning ? (
-                  <Loader2 size={12} className="animate-spin mr-1" />
-                ) : (
-                  <Play size={11} className="mr-1 fill-current text-zinc-400" />
-                )}
-                Run Code
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleSubmitCode}
-                disabled={isRunning || isSubmitting}
-                className="h-8 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-extrabold active:scale-95 shadow-sm transition-all border-transparent"
-              >
-                {isSubmitting ? (
-                  <Loader2 size={12} className="animate-spin mr-1" />
-                ) : (
-                  <Send size={11} className="mr-1" />
-                )}
-                Submit
-              </Button>
-            </div>
-          )}
-          <Link
-            href="/submissions"
-            className="text-xs text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold flex items-center gap-1 active:scale-95 transition-all"
-          >
-            <History size={12} />
-            Submissions History
-          </Link>
-        </div>
+        <Link
+          href="/submissions"
+          className="text-xs text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold flex items-center gap-1 active:scale-95 transition-all"
+        >
+          <History size={12} />
+          Submissions History
+        </Link>
       </div>
 
       {/* Description Tab Content */}

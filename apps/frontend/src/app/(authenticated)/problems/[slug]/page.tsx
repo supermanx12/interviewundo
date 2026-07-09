@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth, useSocket, useToast } from '@/providers';
 import { Button } from '@/components/ui/button';
 import { DifficultyBadge } from '@/components/ui/difficulty-badge';
-import { ChevronLeft, RotateCcw, Settings, HelpCircle } from 'lucide-react';
+import { ChevronLeft, RotateCcw, Settings, HelpCircle, Play, Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ReactWorkspace from '@/components/workspace/ReactWorkspace';
 import { ProblemDescriptionPanel } from './ProblemDescriptionPanel';
@@ -410,6 +410,39 @@ export default function ProblemWorkspacePage() {
 
         {/* Editor Controls */}
         <div className="flex items-center gap-2">
+          {/* Run & Submit buttons */}
+          <div className="flex items-center gap-2 mr-1">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleRunCode}
+              disabled={isRunning || isSubmitting}
+              className="h-8.5 px-3 rounded-lg border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800 text-xs font-bold active:scale-95 transition-all"
+            >
+              {isRunning ? (
+                <Loader2 size={13} className="animate-spin mr-1" />
+              ) : (
+                <Play size={12} className="mr-1.5 fill-current text-zinc-400" />
+              )}
+              Run Code
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleSubmitCode}
+              disabled={isRunning || isSubmitting}
+              className="h-8.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold active:scale-95 shadow-sm shadow-emerald-600/10 hover:shadow-emerald-500/20 border-transparent transition-all"
+            >
+              {isSubmitting ? (
+                <Loader2 size={13} className="animate-spin mr-1" />
+              ) : (
+                <Send size={12} className="mr-1.5" />
+              )}
+              Submit
+            </Button>
+          </div>
+
           {/* Font Size Selector */}
           <div className="hidden sm:flex items-center gap-1 bg-muted/40 border border-border px-2 py-1 rounded-lg">
             <Settings size={13} className="text-muted-foreground" />
@@ -494,10 +527,6 @@ export default function ProblemWorkspacePage() {
             code={code}
             solutionCode={problem.solutionCode}
             tags={problem.tags}
-            handleRunCode={handleRunCode}
-            handleSubmitCode={handleSubmitCode}
-            isRunning={isRunning}
-            isSubmitting={isSubmitting}
           />
         </div>
 
