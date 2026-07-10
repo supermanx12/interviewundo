@@ -1,0 +1,1 @@
+ "Read array-questions.md and ADDING_QUESTIONS.md. For every question title not already in seed-arrays.ts, generate the full problem object with description, solution, starter code, and 4+ test cases.if the question list is bigmake it part by part, Add them to seed-arrays.ts." The ADDING_QUESTIONS.md guide has everything the agent needs.
