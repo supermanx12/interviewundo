@@ -13,9 +13,10 @@
     "clean": "rm -rf dist",
     "migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
     "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
-    "seed": "dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed.ts && dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-arrays.ts && dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-other-js.ts",
+    "seed": "dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed.ts && dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-arrays.ts && dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-other-js.ts && dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-strings.ts",
     "db:seed:arrays": "dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-arrays.ts",
     "db:seed:other-js": "dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-other-js.ts",
+    "db:seed:strings": "dotenv -e ../../.env -- tsx src/infrastructure/database/prisma/seed-strings.ts",
     "studio": "dotenv -e ../../.env -- prisma studio",
     "generate": "dotenv -e ../../.env -- prisma generate"
   },
