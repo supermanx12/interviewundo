@@ -1842,6 +1842,64 @@ Return the next integer scaled to the range \`[min, max]\` inclusive: \`Math.flo
     isPublished: true,
     testCases: [{ input: '[]', expectedOutput: '[3,6,9,12,15]', isHidden: false, order: 1 }],
   },
+  {
+    title: 'Promise.all Polyfill',
+    slug: 'promise-all-polyfill',
+    description: `Implement the \`promiseAll\` function which mimics \`Promise.all\`.
+
+The function takes an array of Promises and returns a single Promise that resolves when all input promises have resolved, or rejects immediately when any input promise rejects.
+
+### Example:
+\`\`\`javascript
+const p1 = Promise.resolve(3);
+const p2 = 42;
+const p3 = new Promise((resolve) => setTimeout(resolve, 100, 'foo'));
+
+promiseAll([p1, p2, p3]).then(values => console.log(values)); // [3, 42, 'foo']
+\`\`\``,
+    difficulty: 'HARD',
+    category: 'JAVASCRIPT',
+    tags: ['promises', 'async'],
+    starterCode: `function promiseAll(promises) {
+  // Write your polyfill here
+}`,
+    solutionCode: `function promiseAll(promises) {
+  return new Promise((resolve, reject) => {
+    if (!Array.isArray(promises)) {
+      return reject(new TypeError('Arguments must be an array'));
+    }
+    
+    const results = [];
+    let completed = 0;
+    
+    if (promises.length === 0) {
+      return resolve([]);
+    }
+    
+    promises.forEach((promise, index) => {
+      Promise.resolve(promise)
+        .then((val) => {
+          results[index] = val;
+          completed++;
+          if (completed === promises.length) {
+            resolve(results);
+          }
+        })
+        .catch(reject);
+    });
+  });
+}`,
+    order: 265,
+    isPublished: true,
+    testCases: [
+      {
+        input: '["promise-all-simple"]',
+        expectedOutput: '"passed"',
+        isHidden: false,
+        order: 1,
+      },
+    ],
+  },
 ];
 
 async function main() {

@@ -1122,6 +1122,135 @@ const objectProblems: ProblemSeed[] = [
       { input: '[{"a":0,"b":-5}, 0]', expectedOutput: '["b"]', isHidden: true, order: 4 },
     ],
   },
+  {
+    title: 'Deep Clone Object',
+    slug: 'deep-clone-object',
+    description: `Write a function \`deepClone(obj)\` that returns a deep copy of the passed object.
+
+The object can contain nested objects, arrays, strings, numbers, booleans, null, and Date instances. It must handle circular references correctly without entering an infinite loop.
+
+### Example:
+\`\`\`javascript
+const original = { a: 1, b: { c: 2 } };
+const clone = deepClone(original);
+clone.b.c = 3;
+original.b.c; // 2
+\`\`\``,
+    difficulty: 'MEDIUM',
+    category: 'JAVASCRIPT',
+    tags: ['objects', 'recursion'],
+    starterCode: `function deepClone(obj, cache = new WeakMap()) {
+  // Write your code here
+}`,
+    solutionCode: `function deepClone(obj, cache = new WeakMap()) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj instanceof Date) return new Date(obj.getTime());
+  
+  if (cache.has(obj)) {
+    return cache.get(obj);
+  }
+  
+  const clone = Array.isArray(obj) ? [] : {};
+  cache.set(obj, clone);
+  
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      clone[key] = deepClone(obj[key], cache);
+    }
+  }
+  return clone;
+}`,
+    order: 433,
+    isPublished: true,
+    testCases: [
+      {
+        input: '[{"a":1,"b":{"c":2}}]',
+        expectedOutput: '{"a":1,"b":{"c":2}}',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '[[1,{"x":9},[2]]]',
+        expectedOutput: '[1,{"x":9},[2]]',
+        isHidden: false,
+        order: 2,
+      },
+    ],
+  },
+  {
+    title: 'Event Emitter Class',
+    slug: 'event-emitter-class',
+    description: `Design an \`EventEmitter\` class. It should support subscribing to events, unsubscribing from events, and emitting events.
+
+Methods:
+1. \`subscribe(eventName, callback)\`: Registers callback for the event. Returns a subscription object with a \`release()\` method to unsubscribe.
+2. \`emit(eventName, args)\`: Calls all registered callbacks for the event with the arguments array. Returns an array of execution results.
+
+### Example:
+\`\`\`javascript
+const emitter = new EventEmitter();
+const sub = emitter.subscribe('click', (x) => x * 2);
+emitter.emit('click', [5]); // [10]
+sub.release();
+emitter.emit('click', [5]); // []
+\`\`\``,
+    difficulty: 'MEDIUM',
+    category: 'JAVASCRIPT',
+    tags: ['classes', 'events'],
+    starterCode: `class EventEmitter {
+  subscribe(eventName, callback) {
+    // Write subscription logic
+    return {
+      release: () => {}
+    };
+  }
+  
+  emit(eventName, args = []) {
+    // Write emit logic
+  }
+}`,
+    solutionCode: `class EventEmitter {
+  constructor() {
+    this.events = new Map();
+  }
+
+  subscribe(eventName, callback) {
+    if (!this.events.has(eventName)) {
+      this.events.set(eventName, []);
+    }
+    const callbacks = this.events.get(eventName);
+    callbacks.push(callback);
+
+    return {
+      release: () => {
+        const index = callbacks.indexOf(callback);
+        if (index !== -1) {
+          callbacks.splice(index, 1);
+        }
+        if (callbacks.length === 0) {
+          this.events.delete(eventName);
+        }
+      }
+    };
+  }
+  
+  emit(eventName, args = []) {
+    if (!this.events.has(eventName)) return [];
+    const callbacks = this.events.get(eventName);
+    return callbacks.map((cb) => cb(...args));
+  }
+}`,
+    order: 434,
+    isPublished: true,
+    testCases: [
+      {
+        input: '["emitter-test-simple"]',
+        expectedOutput: '"passed"',
+        isHidden: false,
+        order: 1,
+      },
+    ],
+  },
 ];
 
 async function main() {

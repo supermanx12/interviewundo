@@ -169,6 +169,99 @@ Return an object containing \`{ req, res }\` after the pipeline executes (or sho
       { input: '[{}, {}, []]', expectedOutput: '{"req":{},"res":{}}', isHidden: true, order: 4 },
     ],
   },
+  {
+    title: 'Hash a String with SHA-256',
+    slug: 'hash-string-sha256',
+    description: `Use Node.js's built-in \`crypto\` module to generate a SHA-256 hash of a given text.
+
+Return the hash as a hexadecimal string.
+
+### Example:
+**Input:** text = "hello"  
+**Output:** "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"`,
+    difficulty: 'EASY',
+    category: 'NODEJS',
+    starterCode: `const crypto = require('crypto');
+
+function hashSHA256(text) {
+  // Write your code here
+}`,
+    solutionCode: `const crypto = require('crypto');
+
+function hashSHA256(text) {
+  return crypto.createHash('sha256').update(text).digest('hex');
+}`,
+    tags: ['crypto', 'security'],
+    isPublished: true,
+    order: 16,
+    testCases: [
+      {
+        input: '["hello"]',
+        expectedOutput: '"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '[""]',
+        expectedOutput: '"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"',
+        isHidden: false,
+        order: 2,
+      },
+      {
+        input: '["interview-prep"]',
+        expectedOutput: '"226bc8f15d74944fa12419c8d57577317e08929e0618037305988e404b901594"',
+        isHidden: true,
+        order: 3,
+      },
+    ],
+  },
+  {
+    title: 'Parse URL Query Parameters',
+    slug: 'parse-url-query-params',
+    description: `Write a function that parses a URL string and returns its query parameters as a key-value object.
+
+You can use Node's built-in \`URL\` API.
+
+### Example:
+**Input:** urlString = "https://example.com?name=Alice&age=25"  
+**Output:** { "name": "Alice", "age": "25" }`,
+    difficulty: 'EASY',
+    category: 'NODEJS',
+    starterCode: `function parseQueryParams(urlString) {
+  // Write your code here
+}`,
+    solutionCode: `function parseQueryParams(urlString) {
+  const url = new URL(urlString);
+  const params = {};
+  url.searchParams.forEach((value, key) => {
+    params[key] = value;
+  });
+  return params;
+}`,
+    tags: ['url', 'parsing'],
+    isPublished: true,
+    order: 17,
+    testCases: [
+      {
+        input: '["https://example.com?name=Alice&age=25"]',
+        expectedOutput: '{"name":"Alice","age":"25"}',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '["https://google.com/search?q=nodejs&hl=en"]',
+        expectedOutput: '{"q":"nodejs","hl":"en"}',
+        isHidden: false,
+        order: 2,
+      },
+      {
+        input: '["https://api.github.com/users"]',
+        expectedOutput: '{}',
+        isHidden: true,
+        order: 3,
+      },
+    ],
+  },
 ];
 
 async function main() {

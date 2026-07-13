@@ -634,6 +634,94 @@ const stringProblems: ProblemSeed[] = [
       { input: '["a b cd ef"]', expectedOutput: '"cd"', isHidden: true, order: 4 },
     ],
   },
+  {
+    title: 'Reverse a String',
+    slug: 'reverse-a-string',
+    description: `Write a function that reverses a string. The input string is given as an array of characters \`s\`.
+
+You must do this by modifying the input array in-place with O(1) extra memory.
+
+### Example 1:
+**Input:** s = ["h","e","l","l","o"]  
+**Output:** ["o","l","l","e","h"]`,
+    difficulty: 'EASY',
+    category: 'JAVASCRIPT',
+    tags: ['strings', 'two-pointers'],
+    starterCode: `function reverseString(s) {
+  // Write your code here
+  return s;
+}`,
+    solutionCode: `function reverseString(s) {
+  let left = 0;
+  let right = s.length - 1;
+  while (left < right) {
+    const temp = s[left];
+    s[left] = s[right];
+    s[right] = temp;
+    left++;
+    right--;
+  }
+  return s;
+}`,
+    order: 320,
+    isPublished: true,
+    testCases: [
+      {
+        input: '[["h","e","l","l","o"]]',
+        expectedOutput: '["o","l","l","e","h"]',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '[["H","a","n","n","a","h"]]',
+        expectedOutput: '["h","a","n","n","a","H"]',
+        isHidden: false,
+        order: 2,
+      },
+      { input: '[["a"]]', expectedOutput: '["a"]', isHidden: true, order: 3 },
+      {
+        input: '[["t","e","s","t"]]',
+        expectedOutput: '["t","s","e","t"]',
+        isHidden: true,
+        order: 4,
+      },
+    ],
+  },
+  {
+    title: 'Palindrome Checker',
+    slug: 'palindrome-checker',
+    description: `A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+Given a string \`s\`, return \`true\` *if it is a palindrome, or \`false\` otherwise*.
+
+### Example 1:
+**Input:** s = "A man, a plan, a canal: Panama"  
+**Output:** true  
+**Explanation:** "amanaplanacanalpanama" is a palindrome.`,
+    difficulty: 'EASY',
+    category: 'JAVASCRIPT',
+    tags: ['strings'],
+    starterCode: `function isPalindrome(s) {
+  // Write your code here
+}`,
+    solutionCode: `function isPalindrome(s) {
+  const cleaned = s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return cleaned === cleaned.split('').reverse().join('');
+}`,
+    order: 321,
+    isPublished: true,
+    testCases: [
+      {
+        input: '["A man, a plan, a canal: Panama"]',
+        expectedOutput: 'true',
+        isHidden: false,
+        order: 1,
+      },
+      { input: '["race a car"]', expectedOutput: 'false', isHidden: false, order: 2 },
+      { input: '[" "]', expectedOutput: 'true', isHidden: true, order: 3 },
+      { input: '["0P"]', expectedOutput: 'false', isHidden: true, order: 4 },
+    ],
+  },
 ];
 
 async function main() {

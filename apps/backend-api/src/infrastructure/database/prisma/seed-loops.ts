@@ -510,6 +510,120 @@ Return \`result\`.
       { input: '[5]', expectedOutput: '12', isHidden: true, order: 4 },
     ],
   },
+  {
+    title: 'Fibonacci Generator',
+    slug: 'fibonacci-generator',
+    description: `Write a generator function that yields the infinite Fibonacci sequence.
+
+The sequence starts with 0 and 1, and each subsequent number is the sum of the previous two.
+
+### Example:
+\`\`\`javascript
+const gen = fibonacciGenerator();
+gen.next().value; // 0
+gen.next().value; // 1
+gen.next().value; // 1
+gen.next().value; // 2
+\`\`\`  
+Write a function \`getFibonacciArray(n)\` that returns the first \`n\` Fibonacci numbers using a generator.`,
+    difficulty: 'MEDIUM',
+    category: 'JAVASCRIPT',
+    tags: ['generators', 'sequences'],
+    starterCode: `function* fibonacciGenerator() {
+  // Write your generator here
+}
+
+function getFibonacciArray(n) {
+  const gen = fibonacciGenerator();
+  const result = [];
+  for (let i = 0; i < n; i++) {
+    result.push(gen.next().value);
+  }
+  return result;
+}`,
+    solutionCode: `function* fibonacciGenerator() {
+  let prev = 0;
+  let curr = 1;
+  yield prev;
+  yield curr;
+  while (true) {
+    const next = prev + curr;
+    yield next;
+    prev = curr;
+    curr = next;
+  }
+}
+
+function getFibonacciArray(n) {
+  if (n <= 0) return [];
+  const gen = fibonacciGenerator();
+  const result = [];
+  for (let i = 0; i < n; i++) {
+    result.push(gen.next().value);
+  }
+  return result;
+}`,
+    order: 515,
+    isPublished: true,
+    testCases: [
+      { input: '[5]', expectedOutput: '[0,1,1,2,3]', isHidden: false, order: 1 },
+      { input: '[1]', expectedOutput: '[0]', isHidden: false, order: 2 },
+      { input: '[10]', expectedOutput: '[0,1,1,2,3,5,8,13,21,34]', isHidden: true, order: 3 },
+    ],
+  },
+  {
+    title: 'FizzBuzz',
+    slug: 'fizz-buzz',
+    description: `Given an integer \`n\`, return *a string array \`answer\` (1-indexed) where*:
+
+* \`answer[i] == "FizzBuzz"\` if \`i\` is divisible by 3 and 5.
+* \`answer[i] == "Fizz"\` if \`i\` is divisible by 3.
+* \`answer[i] == "Buzz"\` if \`i\` is divisible by 5.
+* \`answer[i] == i\` (as a string) if none of the above conditions are true.
+
+### Example 1:
+**Input:** n = 3  
+**Output:** ["1","2","Fizz"]`,
+    difficulty: 'EASY',
+    category: 'JAVASCRIPT',
+    tags: ['loops', 'math'],
+    starterCode: `function fizzBuzz(n) {
+  // Write your code here
+}`,
+    solutionCode: `function fizzBuzz(n) {
+  const result = [];
+  for (let i = 1; i <= n; i++) {
+    if (i % 3 === 0 && i % 5 === 0) {
+      result.push('FizzBuzz');
+    } else if (i % 3 === 0) {
+      result.push('Fizz');
+    } else if (i % 5 === 0) {
+      result.push('Buzz');
+    } else {
+      result.push(i.toString());
+    }
+  }
+  return result;
+}`,
+    order: 516,
+    isPublished: true,
+    testCases: [
+      { input: '[3]', expectedOutput: '["1","2","Fizz"]', isHidden: false, order: 1 },
+      {
+        input: '[5]',
+        expectedOutput: '["1","2","Fizz","4","Buzz"]',
+        isHidden: false,
+        order: 2,
+      },
+      {
+        input: '[15]',
+        expectedOutput:
+          '["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]',
+        isHidden: true,
+        order: 3,
+      },
+    ],
+  },
 ];
 
 async function main() {

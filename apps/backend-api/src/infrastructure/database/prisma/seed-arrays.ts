@@ -2584,6 +2584,200 @@ If the index is out of bounds (negative or greater than array length), you shoul
       { input: '[[]]', expectedOutput: '[]', isHidden: true, order: 4 },
     ],
   },
+  {
+    title: 'Two Sum',
+    slug: 'two-sum',
+    description: `Given an array of integers \`nums\` and an integer \`target\`, return *indices of the two numbers such that they add up to \`target\`*.
+
+You may assume that each input would have ***exactly* one solution**, and you may not use the *same* element twice.
+
+You can return the answer in any order.
+
+### Example 1:
+**Input:** nums = [2,7,11,15], target = 9  
+**Output:** [0,1]  
+**Explanation:** Because nums[0] + nums[1] == 9, we return [0, 1].`,
+    difficulty: 'EASY',
+    category: 'JAVASCRIPT',
+    tags: ['arrays', 'hash-map'],
+    starterCode: `function twoSum(nums, target) {
+  // Write your code here
+}`,
+    solutionCode: `function twoSum(nums, target) {
+  const map = new Map();
+  for (let i = 0; i < nums.length; i++) {
+    const complement = target - nums[i];
+    if (map.has(complement)) {
+      return [map.get(complement), i];
+    }
+    map.set(nums[i], i);
+  }
+  return [];
+}`,
+    order: 177,
+    isPublished: true,
+    testCases: [
+      { input: '[[2,7,11,15], 9]', expectedOutput: '[0,1]', isHidden: false, order: 1 },
+      { input: '[[3,2,4], 6]', expectedOutput: '[1,2]', isHidden: false, order: 2 },
+      { input: '[[3,3], 6]', expectedOutput: '[0,1]', isHidden: false, order: 3 },
+      { input: '[[1,5,9,10,15], 25]', expectedOutput: '[3,4]', isHidden: true, order: 4 },
+      { input: '[[-1,-2,-3,-4,-5], -8]', expectedOutput: '[2,4]', isHidden: true, order: 5 },
+    ],
+  },
+  {
+    title: 'Chunk Array',
+    slug: 'chunk-array',
+    description: `Given an array \`arr\` and a chunk size \`size\`, return a **chunked** array.
+
+A chunked array contains the original elements broken into sub-arrays of length \`size\`. The last sub-array may be shorter than \`size\` if the array length is not evenly divisible.
+
+You must not modify the original array.
+
+### Example 1:
+**Input:** arr = [1, 2, 3, 4, 5], size = 2  
+**Output:** [[1, 2], [3, 4], [5]]`,
+    difficulty: 'EASY',
+    category: 'JAVASCRIPT',
+    tags: ['arrays'],
+    starterCode: `function chunk(arr, size) {
+  // Write your code here
+}`,
+    solutionCode: `function chunk(arr, size) {
+  const result = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}`,
+    order: 178,
+    isPublished: true,
+    testCases: [
+      {
+        input: '[[1, 2, 3, 4, 5], 2]',
+        expectedOutput: '[[1,2],[3,4],[5]]',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '[[1, 9, 6, 3, 2], 3]',
+        expectedOutput: '[[1,9,6],[3,2]]',
+        isHidden: false,
+        order: 2,
+      },
+      { input: '[[], 1]', expectedOutput: '[]', isHidden: true, order: 3 },
+    ],
+  },
+  {
+    title: 'Flatten Array',
+    slug: 'flatten-array',
+    description: `Given a multi-dimensional array \`arr\` and a depth \`n\`, return a **flattened** array.
+
+A multi-dimensional array is a recursive data structure containing integers or other multi-dimensional arrays. A flattened array contains the elements in their original order, with all sub-arrays flattened up to depth \`n\`.
+
+If \`n\` is not provided, flatten the array completely.
+
+### Example 1:
+**Input:** arr = [1, 2, 3, [4, 5, [6, 7]], 8, [9]], n = 1  
+**Output:** [1, 2, 3, 4, 5, [6, 7], 8, 9]`,
+    difficulty: 'MEDIUM',
+    category: 'JAVASCRIPT',
+    tags: ['arrays', 'recursion'],
+    starterCode: `function flat(arr, n) {
+  // Write your code here
+}`,
+    solutionCode: `function flat(arr, n) {
+  const depth = n === undefined ? Infinity : n;
+  if (depth <= 0) return arr.slice();
+  
+  const result = [];
+  for (const item of arr) {
+    if (Array.isArray(item) && depth > 0) {
+      result.push(...flat(item, depth - 1));
+    } else {
+      result.push(item);
+    }
+  }
+  return result;
+}`,
+    order: 179,
+    isPublished: true,
+    testCases: [
+      {
+        input: '[[1, 2, 3, [4, 5, [6, 7]], 8, [9]], 1]',
+        expectedOutput: '[1,2,3,4,5,[6,7],8,9]',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '[[1, 2, 3, [4, 5, [6, 7]], 8, [9]], 2]',
+        expectedOutput: '[1,2,3,4,5,6,7,8,9]',
+        isHidden: false,
+        order: 2,
+      },
+      {
+        input: '[[[1, [2, [3, [4]]]]]]',
+        expectedOutput: '[1,2,3,4]',
+        isHidden: true,
+        order: 3,
+      },
+    ],
+  },
+  {
+    title: 'Merge Sorted Arrays',
+    slug: 'merge-sorted-arrays',
+    description: `You are given two integer arrays \`nums1\` and \`nums2\`, sorted in non-decreasing order, and two integers \`m\` and \`n\`, representing the number of elements in \`nums1\` and \`nums2\` respectively.
+
+Merge \`nums1\` and \`nums2\` into a single array sorted in non-decreasing order.
+
+The modification must be in-place. The array \`nums1\` has a length of \`m + n\`, where the first \`m\` elements denote the elements that should be merged, and the last \`n\` elements are set to 0 and should be ignored.
+
+### Example 1:
+**Input:** nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3  
+**Output:** [1,2,2,3,5,6]`,
+    difficulty: 'EASY',
+    category: 'JAVASCRIPT',
+    tags: ['arrays', 'two-pointers'],
+    starterCode: `function merge(nums1, m, nums2, n) {
+  // Write your code here
+  return nums1;
+}`,
+    solutionCode: `function merge(nums1, m, nums2, n) {
+  let p1 = m - 1;
+  let p2 = n - 1;
+  let p = m + n - 1;
+
+  while (p1 >= 0 && p2 >= 0) {
+    if (nums1[p1] > nums2[p2]) {
+      nums1[p] = nums1[p1];
+      p1--;
+    } else {
+      nums1[p] = nums2[p2];
+      p2--;
+    }
+    p--;
+  }
+
+  while (p2 >= 0) {
+    nums1[p] = nums2[p2];
+    p2--;
+    p--;
+  }
+  
+  return nums1;
+}`,
+    order: 180,
+    isPublished: true,
+    testCases: [
+      {
+        input: '[[1,2,3,0,0,0], 3, [2,5,6], 3]',
+        expectedOutput: '[1,2,2,3,5,6]',
+        isHidden: false,
+        order: 1,
+      },
+      { input: '[[1], 1, [], 0]', expectedOutput: '[1]', isHidden: false, order: 2 },
+      { input: '[[0], 0, [1], 1]', expectedOutput: '[1]', isHidden: true, order: 3 },
+    ],
+  },
 ];
 
 async function main() {

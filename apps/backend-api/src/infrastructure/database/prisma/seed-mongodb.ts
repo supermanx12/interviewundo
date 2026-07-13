@@ -25,7 +25,9 @@ const mongodbProblems: ProblemSeed[] = [
   {
     title: 'Calculate Average Marks',
     slug: 'mongodb-average-marks',
-    description: `Write an asynchronous function \`getAverageMarks(db)\` that queries the \`students\` collection and returns the average marks of all students. The result should be a single number. If there are no students, return \`null\`.
+    description: `Write a query to aggregate the \`students\` collection and return the average marks of all students. The result should be returned as an array containing a single document with the field \`avgMarks\`. If there are no students, return an empty array.
+
+You can write this as a raw query (e.g. \`db.students.aggregate(...)\`) or as an asynchronous function (e.g. \`async function getAverageMarks(db) { ... }\`).
 
 ### Example 1:
 **Collection structure (students):**
@@ -35,39 +37,41 @@ const mongodbProblems: ProblemSeed[] = [
   { "name": "Bob", "marks": 90 }
 ]
 \`\`\`
-**Output:** 85`,
+**Output:**
+\`\`\`json
+[
+  { "avgMarks": 85 }
+]
+\`\`\``,
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'aggregation'],
-    starterCode: `async function getAverageMarks(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function getAverageMarks(db) {
-  const result = await db.students.aggregate([
-    { $group: { _id: null, avgMarks: { $avg: "$marks" } } }
-  ]).toArray();
-  return result.length > 0 ? result[0].avgMarks : null;
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here
+// e.g. db.students.aggregate(...)`,
+    solutionCode: `db.students.aggregate([
+  { $group: { _id: null, avgMarks: { $avg: "$marks" } } },
+  { $project: { _id: 0, avgMarks: 1 } }
+])`,
     order: 701,
     isPublished: true,
     testCases: [
       {
         input: '{"students":[{"name":"Alice","marks":80},{"name":"Bob","marks":90}]}',
-        expectedOutput: '85',
+        expectedOutput: '[{"avgMarks":85}]',
         isHidden: false,
         order: 1,
       },
-      { input: '{"students":[]}', expectedOutput: 'null', isHidden: false, order: 2 },
+      { input: '{"students":[]}', expectedOutput: '[]', isHidden: false, order: 2 },
       {
         input: '{"students":[{"name":"C","marks":100}]}',
-        expectedOutput: '100',
+        expectedOutput: '[{"avgMarks":100}]',
         isHidden: true,
         order: 3,
       },
       {
         input:
           '{"students":[{"name":"A","marks":70},{"name":"B","marks":75},{"name":"C","marks":80}]}',
-        expectedOutput: '75',
+        expectedOutput: '[{"avgMarks":75}]',
         isHidden: true,
         order: 4,
       },
@@ -76,7 +80,9 @@ const mongodbProblems: ProblemSeed[] = [
   {
     title: 'Find Second Largest Mark',
     slug: 'mongodb-second-largest-mark',
-    description: `Write an asynchronous function \`getSecondLargestMark(db)\` that queries the \`students\` collection and returns the second largest mark among all students. If there are fewer than 2 students or fewer than 2 unique marks, return \`null\`.
+    description: `Write a query to find the second largest mark among all students in the \`students\` collection. The result should be returned as an array of documents containing the field \`marks\`. If there are fewer than 2 students or fewer than 2 unique marks, return an empty array.
+
+You can write this as a raw query (e.g. \`db.students.aggregate(...)\`) or as an asynchronous function.
 
 ### Example 1:
 **Collection (students):**
@@ -87,39 +93,45 @@ const mongodbProblems: ProblemSeed[] = [
   { "name": "Charlie", "marks": 90 }
 ]
 \`\`\`
-**Output:** 90`,
+**Output:**
+\`\`\`json
+[
+  { "marks": 90 }
+]
+\`\`\``,
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'query'],
-    starterCode: `async function getSecondLargestMark(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function getSecondLargestMark(db) {
-  const students = await db.students.find({}, { projection: { marks: 1, _id: 0 } }).sort({ marks: -1 }).toArray();
-  const marks = [...new Set(students.map(s => s.marks))];
-  return marks.length >= 2 ? marks[1] : null;
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here
+// e.g. db.students.aggregate(...)`,
+    solutionCode: `db.students.aggregate([
+  { $group: { _id: "$marks" } },
+  { $sort: { _id: -1 } },
+  { $skip: 1 },
+  { $limit: 1 },
+  { $project: { marks: "$_id", _id: 0 } }
+])`,
     order: 702,
     isPublished: true,
     testCases: [
       {
         input:
           '{"students":[{"name":"Alice","marks":80},{"name":"Bob","marks":95},{"name":"Charlie","marks":90}]}',
-        expectedOutput: '90',
+        expectedOutput: '[{"marks":90}]',
         isHidden: false,
         order: 1,
       },
       {
         input: '{"students":[{"name":"Alice","marks":90},{"name":"Bob","marks":90}]}',
-        expectedOutput: 'null',
+        expectedOutput: '[]',
         isHidden: false,
         order: 2,
       },
-      { input: '{"students":[]}', expectedOutput: 'null', isHidden: true, order: 3 },
+      { input: '{"students":[]}', expectedOutput: '[]', isHidden: true, order: 3 },
       {
         input:
           '{"students":[{"name":"A","marks":50},{"name":"B","marks":60},{"name":"C","marks":70}]}',
-        expectedOutput: '60',
+        expectedOutput: '[{"marks":60}]',
         isHidden: true,
         order: 4,
       },
@@ -128,7 +140,9 @@ const mongodbProblems: ProblemSeed[] = [
   {
     title: 'Increase Marks by 10 Percent',
     slug: 'mongodb-increase-marks-ten-percent',
-    description: `Write an asynchronous function \`increaseMarks(db)\` that updates the \`marks\` of all students in the \`students\` collection by increasing them by 10%. After performing the update, return all documents in the \`students\` collection sorted by name ascending (exclude \`_id\` field from results).
+    description: `Write a query to update the \`marks\` of all students in the \`students\` collection by increasing them by 10%, and then return all documents in the \`students\` collection sorted by name ascending (exclude \`_id\` field from results).
+
+You can write this as a raw multi-statement query or as an asynchronous function.
 
 ### Example 1:
 **Collection before (students):**
@@ -146,15 +160,12 @@ const mongodbProblems: ProblemSeed[] = [
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'update'],
-    starterCode: `async function increaseMarks(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function increaseMarks(db) {
-  await db.students.updateMany({}, [
-    { $set: { marks: { $multiply: ["$marks", 1.1] } } }
-  ]);
-  return db.students.find({}, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here
+// e.g. db.students.updateMany(...)`,
+    solutionCode: `db.students.updateMany({}, [
+  { $set: { marks: { $multiply: ["$marks", 1.1] } } }
+]);
+db.students.find({}, { projection: { _id: 0 } }).sort({ name: 1 });`,
     order: 703,
     isPublished: true,
     testCases: [
@@ -182,7 +193,9 @@ const mongodbProblems: ProblemSeed[] = [
   {
     title: 'Reduce Salary by 10 Percent',
     slug: 'mongodb-reduce-salary-ten-percent',
-    description: `Write an asynchronous function \`reduceSalary(db)\` that updates the \`salary\` of all employees in the \`employees\` collection by reducing it by 10%. After performing the update, return all documents in the \`employees\` collection sorted by name ascending (exclude \`_id\` field from results).
+    description: `Write a query to update the \`salary\` of all employees in the \`employees\` collection by reducing it by 10%, and then return all documents in the \`employees\` collection sorted by name ascending (exclude \`_id\` field from results).
+
+You can write this as a raw multi-statement query or as an asynchronous function.
 
 ### Example 1:
 **Collection before (employees):**
@@ -200,15 +213,11 @@ const mongodbProblems: ProblemSeed[] = [
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'update'],
-    starterCode: `async function reduceSalary(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function reduceSalary(db) {
-  await db.employees.updateMany({}, [
-    { $set: { salary: { $multiply: ["$salary", 0.9] } } }
-  ]);
-  return db.employees.find({}, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.employees.updateMany({}, [
+  { $set: { salary: { $multiply: ["$salary", 0.9] } } }
+]);
+db.employees.find({}, { projection: { _id: 0 } }).sort({ name: 1 });`,
     order: 704,
     isPublished: true,
     testCases: [
@@ -236,7 +245,9 @@ const mongodbProblems: ProblemSeed[] = [
   {
     title: 'Find Names Ending with J',
     slug: 'mongodb-names-ending-with-j',
-    description: `Write an asynchronous function \`findNamesEndingWithJ(db)\` that queries the \`users\` collection and returns all documents where the \`name\` ends with the letter "j" (case-insensitive). Return the results (excluding \`_id\`) sorted by \`name\` ascending.
+    description: `Write a query to find all documents in the \`users\` collection where the \`name\` ends with the letter "j" (case-insensitive). Return the results (excluding \`_id\`) sorted by \`name\` ascending.
+
+You can write this as a raw query or as an asynchronous function.
 
 ### Example 1:
 **Collection (users):**
@@ -257,12 +268,8 @@ const mongodbProblems: ProblemSeed[] = [
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'query'],
-    starterCode: `async function findNamesEndingWithJ(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function findNamesEndingWithJ(db) {
-  return db.users.find({ name: /j$/i }, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.users.find({ name: /j$/i }, { projection: { _id: 0 } }).sort({ name: 1 })`,
     order: 705,
     isPublished: true,
     testCases: [
@@ -290,7 +297,7 @@ const mongodbProblems: ProblemSeed[] = [
   {
     title: 'Group Products by Category',
     slug: 'mongodb-aggregation-group',
-    description: `Write an asynchronous function \`groupProducts(db)\` that aggregates the \`products\` collection, groups the products by \`category\`, and calculates the total inventory count (sum of \`quantity\`) for each category. Return the grouped results sorted by \`category\` ascending.
+    description: `Write a query to aggregate the \`products\` collection, group products by \`category\`, and calculate the total inventory count (sum of \`quantity\`) for each category. Return the grouped results sorted by \`category\` ascending.
 
 Each returned document should be formatted as:
 \`\`\`json
@@ -316,15 +323,11 @@ Each returned document should be formatted as:
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'aggregation'],
-    starterCode: `async function groupProducts(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function groupProducts(db) {
-  return db.products.aggregate([
-    { $group: { _id: "$category", totalQuantity: { $sum: "$quantity" } } },
-    { $sort: { _id: 1 } }
-  ]).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.products.aggregate([
+  { $group: { _id: "$category", totalQuantity: { $sum: "$quantity" } } },
+  { $sort: { _id: 1 } }
+])`,
     order: 706,
     isPublished: true,
     testCases: [
@@ -355,7 +358,7 @@ Each returned document should be formatted as:
   {
     title: 'Find Maximum Price in Category',
     slug: 'mongodb-aggregation-max',
-    description: `Write an asynchronous function \`getMaxPriceByCategory(db)\` that groups the documents in the \`products\` collection by \`category\` and finds the maximum \`price\` in each category. Return the results sorted by \`_id\` (category name) ascending.
+    description: `Write a query to group documents in the \`products\` collection by \`category\` and find the maximum \`price\` in each category. Return the results sorted by \`_id\` (category name) ascending.
 
 Format:
 \`\`\`json
@@ -364,15 +367,11 @@ Format:
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'aggregation'],
-    starterCode: `async function getMaxPriceByCategory(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function getMaxPriceByCategory(db) {
-  return db.products.aggregate([
-    { $group: { _id: "$category", maxPrice: { $max: "$price" } } },
-    { $sort: { _id: 1 } }
-  ]).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.products.aggregate([
+  { $group: { _id: "$category", maxPrice: { $max: "$price" } } },
+  { $sort: { _id: 1 } }
+])`,
     order: 707,
     isPublished: true,
     testCases: [
@@ -395,7 +394,7 @@ Format:
   {
     title: 'Find Minimum Age in Department',
     slug: 'mongodb-aggregation-min',
-    description: `Write an asynchronous function \`getMinAgeByDepartment(db)\` that groups documents in the \`employees\` collection by \`department\` and finds the minimum \`age\` in each department. Return the results sorted by department (\`_id\`) ascending.
+    description: `Write a query to group documents in the \`employees\` collection by \`department\` and find the minimum \`age\` in each department. Return the results sorted by department (\`_id\`) ascending.
 
 Format:
 \`\`\`json
@@ -404,15 +403,11 @@ Format:
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'aggregation'],
-    starterCode: `async function getMinAgeByDepartment(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function getMinAgeByDepartment(db) {
-  return db.employees.aggregate([
-    { $group: { _id: "$department", minAge: { $min: "$age" } } },
-    { $sort: { _id: 1 } }
-  ]).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.employees.aggregate([
+  { $group: { _id: "$department", minAge: { $min: "$age" } } },
+  { $sort: { _id: 1 } }
+])`,
     order: 708,
     isPublished: true,
     testCases: [
@@ -435,7 +430,9 @@ Format:
   {
     title: 'Find Documents with Equal Fields',
     slug: 'mongodb-expr-equal-fields',
-    description: `Write an asynchronous function \`findEqualFields(db)\` that queries the \`inventory\` collection and returns all documents where the \`spent\` field is strictly greater than or equal to the \`budget\` field. Return the results (excluding \`_id\`) sorted by \`spent\` ascending.
+    description: `Write a query to find all documents in the \`inventory\` collection where the \`spent\` field is greater than or equal to the \`budget\` field. Return the results (excluding \`_id\`) sorted by \`spent\` ascending.
+
+You can write this as a raw query or as an asynchronous function.
 
 ### Example 1:
 **Collection (inventory):**
@@ -456,14 +453,10 @@ Format:
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'query'],
-    starterCode: `async function findEqualFields(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function findEqualFields(db) {
-  return db.inventory.find({
-    $expr: { $gte: ["$spent", "$budget"] }
-  }, { projection: { _id: 0 } }).sort({ spent: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.inventory.find({
+  $expr: { $gte: ["$spent", "$budget"] }
+}, { projection: { _id: 0 } }).sort({ spent: 1 })`,
     order: 709,
     isPublished: true,
     testCases: [
@@ -493,7 +486,9 @@ Format:
   {
     title: 'Filter Documents by Array Element Match',
     slug: 'mongodb-elemmatch-query',
-    description: `Write an asynchronous function \`findStudentsWithGoodGrades(db)\` that queries the \`students\` collection and returns all documents where at least one element in the \`results\` array has a \`grade\` of "A" and a \`score\` greater than or equal to 90. Return the matching documents (excluding \`_id\`) sorted by \`name\` ascending.
+    description: `Write a query to find all documents in the \`students\` collection where at least one element in the \`results\` array has a \`grade\` of "A" and a \`score\` greater than or equal to 90. Return the matching documents (excluding \`_id\`) sorted by \`name\` ascending.
+
+You can write this as a raw query or as an asynchronous function.
 
 ### Example 1:
 **Collection (students):**
@@ -513,14 +508,10 @@ Format:
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'query'],
-    starterCode: `async function findStudentsWithGoodGrades(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function findStudentsWithGoodGrades(db) {
-  return db.students.find({
-    results: { $elemMatch: { grade: "A", score: { $gte: 90 } } }
-  }, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.students.find({
+  results: { $elemMatch: { grade: "A", score: { $gte: 90 } } }
+}, { projection: { _id: 0 } }).sort({ name: 1 })`,
     order: 710,
     isPublished: true,
     testCases: [
@@ -550,7 +541,9 @@ Format:
   {
     title: 'Find Documents with Existing Field',
     slug: 'mongodb-field-exists',
-    description: `Write an asynchronous function \`findCheckedInUsers(db)\` that queries the \`users\` collection and returns all documents where the \`checkedIn\` field exists and is not null. Return the results (excluding \`_id\`) sorted by \`name\` ascending.
+    description: `Write a query to find all documents in the \`users\` collection where the \`checkedIn\` field exists and is not null. Return the results (excluding \`_id\`) sorted by \`name\` ascending.
+
+You can write this as a raw query or as an asynchronous function.
 
 ### Example 1:
 **Collection (users):**
@@ -570,14 +563,10 @@ Format:
     difficulty: 'EASY',
     category: 'MONGODB',
     tags: ['mongodb', 'query'],
-    starterCode: `async function findCheckedInUsers(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function findCheckedInUsers(db) {
-  return db.users.find({
-    checkedIn: { $exists: true, $ne: null }
-  }, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.users.find({
+  checkedIn: { $exists: true, $ne: null }
+}, { projection: { _id: 0 } }).sort({ name: 1 })`,
     order: 711,
     isPublished: true,
     testCases: [
@@ -606,14 +595,18 @@ Format:
   {
     title: 'Run Multi-Pipeline Facets',
     slug: 'mongodb-facet-aggregation',
-    description: `Write an asynchronous function \`runFacetAggregation(db)\` that aggregates the \`products\` collection using \`$facet\` to return both a list of unique product categories (grouped and sorted by \`_id\` ascending) and a total product count. Return the facet result object.
+    description: `Write a query to aggregate the \`products\` collection using \`$facet\` to return both a list of unique product categories (grouped and sorted by \`_id\` ascending) and a total product count. The result should be returned as an array containing a single document with fields \`categories\` and \`totalCount\`.
+
+You can write this as a raw query (e.g. \`db.products.aggregate(...)\`) or as an asynchronous function.
 
 The output facet object must be structured exactly like:
 \`\`\`json
-{
-  "categories": [ { "_id": "categoryName" }, ... ],
-  "totalCount": [ { "count": number } ]
-}
+[
+  {
+    "categories": [ { "_id": "categoryName" }, ... ],
+    "totalCount": [ { "count": number } ]
+  }
+]
 \`\`\`
 
 ### Example 1:
@@ -626,52 +619,49 @@ The output facet object must be structured exactly like:
 \`\`\`
 **Output:**
 \`\`\`json
-{
-  "categories": [ { "_id": "X" }, { "_id": "Y" } ],
-  "totalCount": [ { "count": 2 } ]
-}
+[
+  {
+    "categories": [ { "_id": "X" }, { "_id": "Y" } ],
+    "totalCount": [ { "count": 2 } ]
+  }
+]
 \`\`\``,
     difficulty: 'MEDIUM',
     category: 'MONGODB',
     tags: ['mongodb', 'aggregation'],
-    starterCode: `async function runFacetAggregation(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function runFacetAggregation(db) {
-  const result = await db.products.aggregate([
-    {
-      $facet: {
-        categories: [
-          { $group: { _id: "$category" } },
-          { $sort: { _id: 1 } }
-        ],
-        totalCount: [
-          { $count: "count" }
-        ]
-      }
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.products.aggregate([
+  {
+    $facet: {
+      categories: [
+        { $group: { _id: "$category" } },
+        { $sort: { _id: 1 } }
+      ],
+      totalCount: [
+        { $count: "count" }
+      ]
     }
-  ]).toArray();
-  return result.length > 0 ? result[0] : null;
-}`,
+  }
+])`,
     order: 712,
     isPublished: true,
     testCases: [
       {
         input: '{"products":[{"name":"A","category":"X"},{"name":"B","category":"Y"}]}',
-        expectedOutput: '{"categories":[{"_id":"X"},{"_id":"Y"}],"totalCount":[{"count":2}]}',
+        expectedOutput: '[{"categories":[{"_id":"X"},{"_id":"Y"}],"totalCount":[{"count":2}]}]',
         isHidden: false,
         order: 1,
       },
       {
         input: '{"products":[]}',
-        expectedOutput: '{"categories":[],"totalCount":[]}',
+        expectedOutput: '[{"categories":[],"totalCount":[]}]',
         isHidden: false,
         order: 2,
       },
       {
         input:
           '{"products":[{"name":"A","category":"Z"},{"name":"B","category":"Z"},{"name":"C","category":"X"}]}',
-        expectedOutput: '{"categories":[{"_id":"X"},{"_id":"Z"}],"totalCount":[{"count":3}]}',
+        expectedOutput: '[{"categories":[{"_id":"X"},{"_id":"Z"}],"totalCount":[{"count":3}]}]',
         isHidden: true,
         order: 3,
       },
@@ -680,7 +670,9 @@ The output facet object must be structured exactly like:
   {
     title: 'Join Collections Using Lookup',
     slug: 'mongodb-lookup-join',
-    description: `Write an asynchronous function \`joinOrdersWithProducts(db)\` that performs a left outer join from the \`orders\` collection to the \`products\` collection based on the \`productId\` field matching the product's \`_id\`. Return the resulting documents sorted by \`_id\` ascending. Exclude database specific fields if any.
+    description: `Write a query to perform a left outer join from the \`orders\` collection to the \`products\` collection based on the \`productId\` field matching the product's \`_id\`. Return the resulting documents sorted by \`_id\` ascending. Exclude database specific fields if any.
+
+You can write this as a raw query or as an asynchronous function.
 
 ### Example 1:
 **orders:**
@@ -705,22 +697,18 @@ The output facet object must be structured exactly like:
     difficulty: 'MEDIUM',
     category: 'MONGODB',
     tags: ['mongodb', 'aggregation'],
-    starterCode: `async function joinOrdersWithProducts(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function joinOrdersWithProducts(db) {
-  return db.orders.aggregate([
-    {
-      $lookup: {
-        from: "products",
-        localField: "productId",
-        foreignField: "_id",
-        as: "productDetails"
-      }
-    },
-    { $sort: { _id: 1 } }
-  ]).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.orders.aggregate([
+  {
+    $lookup: {
+      from: "products",
+      localField: "productId",
+      foreignField: "_id",
+      as: "productDetails"
+    }
+  },
+  { $sort: { _id: 1 } }
+])`,
     order: 713,
     isPublished: true,
     testCases: [
@@ -744,11 +732,13 @@ The output facet object must be structured exactly like:
   {
     title: 'Perform Bulk Write Operations',
     slug: 'mongodb-bulk-write',
-    description: `Write an asynchronous function \`performBulkWrite(db)\` that executes a \`bulkWrite\` on the \`users\` collection:
+    description: `Write a query to execute a \`bulkWrite\` on the \`users\` collection:
 1. Inserts a new user \`{ name: "David", role: "guest" }\`.
 2. Updates the role of \`name: "Alice"\` to \`"admin"\`.
 3. Deletes the user \`name: "Bob"\`.
-Return all users (excluding \`_id\`) sorted by name ascending.
+Then, return all users (excluding \`_id\`) sorted by name ascending.
+
+You can write this as a raw multi-statement query or as an asynchronous function.
 
 ### Example 1:
 **users before:**
@@ -766,17 +756,13 @@ Return all users (excluding \`_id\`) sorted by name ascending.
     difficulty: 'MEDIUM',
     category: 'MONGODB',
     tags: ['mongodb', 'write'],
-    starterCode: `async function performBulkWrite(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function performBulkWrite(db) {
-  await db.users.bulkWrite([
-    { insertOne: { document: { name: "David", role: "guest" } } },
-    { updateOne: { filter: { name: "Alice" }, update: { $set: { role: "admin" } } } },
-    { deleteOne: { filter: { name: "Bob" } } }
-  ]);
-  return db.users.find({}, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `db.users.bulkWrite([
+  { insertOne: { document: { name: "David", role: "guest" } } },
+  { updateOne: { filter: { name: "Alice" }, update: { $set: { role: "admin" } } } },
+  { deleteOne: { filter: { name: "Bob" } } }
+]);
+db.users.find({}, { projection: { _id: 0 } }).sort({ name: 1 });`,
     order: 714,
     isPublished: true,
     testCases: [
@@ -805,7 +791,9 @@ Return all users (excluding \`_id\`) sorted by name ascending.
   {
     title: 'Create Database View',
     slug: 'mongodb-create-view',
-    description: `Write an asynchronous function \`createActiveUsersView(db)\` that creates a database view named \`active_users\` based on the \`users\` collection, containing only documents where \`status\` is "active". The function should then query the new \`active_users\` view and return its documents (excluding \`_id\`) sorted by name.
+    description: `Write a query to create a database view named \`active_users\` based on the \`users\` collection containing only documents where \`status\` is "active", and then query the new \`active_users\` view to return its documents (excluding \`_id\`) sorted by name.
+
+You can write this as a raw multi-statement query or as an asynchronous function.
 
 ### Example 1:
 **users:**
@@ -826,22 +814,18 @@ Return all users (excluding \`_id\`) sorted by name ascending.
     difficulty: 'MEDIUM',
     category: 'MONGODB',
     tags: ['mongodb', 'views'],
-    starterCode: `async function createActiveUsersView(db) {
-  // Write your code here
-}`,
-    solutionCode: `async function createActiveUsersView(db) {
-  try {
-    await db.createCollection("active_users", {
-      viewOn: "users",
-      pipeline: [
-        { $match: { status: "active" } }
-      ]
-    });
-  } catch (e) {
-    // If view already exists
-  }
-  return db.collection("active_users").find({}, { projection: { _id: 0 } }).sort({ name: 1 }).toArray();
-}`,
+    starterCode: `// Write your raw MongoDB query or async function here`,
+    solutionCode: `try {
+  db.createCollection("active_users", {
+    viewOn: "users",
+    pipeline: [
+      { $match: { status: "active" } }
+    ]
+  });
+} catch (e) {
+  // Suppress error if view already exists
+}
+db.collection("active_users").find({}, { projection: { _id: 0 } }).sort({ name: 1 });`,
     order: 715,
     isPublished: true,
     testCases: [
@@ -858,6 +842,150 @@ Return all users (excluding \`_id\`) sorted by name ascending.
         expectedOutput: '[{"name":"X","status":"active"}]',
         isHidden: true,
         order: 3,
+      },
+    ],
+  },
+  {
+    title: 'Active Users Query',
+    slug: 'active-users-query',
+    description: `Write a query to find active users from the \`users\` collection.
+      
+Return an array of documents for users where \`status\` is 'active'. Only return the \`name\` and \`email\` fields (and exclude the \`_id\` field). Sort the results by \`name\` in ascending order.
+
+You can write this as a raw query (e.g. \`db.users.find(...)\`) or as an asynchronous function.
+
+### Example:
+**Input:**
+\`users\` collection:
+| _id | name    | email             | status   |
+|-----|---------|-------------------|----------|
+| 1   | Alice   | alice@test.com    | active   |
+| 2   | Bob     | bob@test.com      | inactive |
+| 3   | Charlie | charlie@test.com  | active   |
+
+**Output:**
+\`[ { "name": "Alice", "email": "alice@test.com" }, { "name": "Charlie", "email": "charlie@test.com" } ]\``,
+    difficulty: 'EASY',
+    category: 'MONGODB',
+    starterCode: `// Write your raw MongoDB query or async function here
+// e.g. db.users.find(...)`,
+    solutionCode: `db.users.find({ status: 'active' }, { projection: { _id: 0, name: 1, email: 1 } }).sort({ name: 1 })`,
+    tags: ['mongodb', 'find'],
+    isPublished: true,
+    order: 716,
+    testCases: [
+      {
+        input:
+          '{"users":[{"_id":1,"name":"Alice","email":"alice@test.com","status":"active"},{"_id":2,"name":"Bob","email":"bob@test.com","status":"inactive"},{"_id":3,"name":"Charlie","email":"charlie@test.com","status":"active"}]}',
+        expectedOutput:
+          '[{"name":"Alice","email":"alice@test.com"},{"name":"Charlie","email":"charlie@test.com"}]',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '{"users":[{"_id":1,"name":"Dave","email":"dave@test.com","status":"inactive"}]}',
+        expectedOutput: '[]',
+        isHidden: true,
+        order: 2,
+      },
+    ],
+  },
+  {
+    title: 'Total Revenue by Product',
+    slug: 'total-revenue-by-product',
+    description: `Write an aggregation query to summarize the \`orders\` collection.
+      
+Use an aggregation pipeline to:
+1. Group orders by \`product\`
+2. Sum up the total revenue (\`price\` multiplied by \`quantity\`) as \`totalRevenue\`
+3. Sort the results by \`totalRevenue\` in descending order.
+
+You can write this as a raw query (e.g. \`db.orders.aggregate(...)\`) or as an asynchronous function.
+
+### Example:
+**Input:**
+\`orders\` collection:
+| _id | product  | price | quantity |
+|-----|----------|-------|----------|
+| 101 | Laptop   | 1000  | 1        |
+| 102 | Mouse    | 25    | 3        |
+| 103 | Laptop   | 1000  | 2        |
+| 104 | Keyboard | 50    | 1        |
+
+**Output:**
+\`[ { "_id": "Laptop", "totalRevenue": 3000 }, { "_id": "Mouse", "totalRevenue": 75 }, { "_id": "Keyboard", "totalRevenue": 50 } ]\``,
+    difficulty: 'MEDIUM',
+    category: 'MONGODB',
+    starterCode: `// Write your raw MongoDB query or async function here
+// e.g. db.orders.aggregate(...)`,
+    solutionCode: `db.orders.aggregate([
+  {
+    $group: {
+      _id: '$product',
+      totalRevenue: { $sum: { $multiply: ['$price', '$quantity'] } }
+    }
+  },
+  {
+    $sort: { totalRevenue: -1 }
+  }
+])`,
+    tags: ['mongodb', 'aggregation'],
+    isPublished: true,
+    order: 717,
+    testCases: [
+      {
+        input:
+          '{"orders":[{"_id":101,"product":"Laptop","price":1000,"quantity":1},{"_id":102,"product":"Mouse","price":25,"quantity":3},{"_id":103,"product":"Laptop","price":1000,"quantity":2},{"_id":104,"product":"Keyboard","price":50,"quantity":1}]}',
+        expectedOutput:
+          '[{"_id":"Laptop","totalRevenue":3000},{"_id":"Mouse","totalRevenue":75},{"_id":"Keyboard","totalRevenue":50}]',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '{"orders":[]}',
+        expectedOutput: '[]',
+        isHidden: true,
+        order: 2,
+      },
+    ],
+  },
+  {
+    title: 'Query Active Mature Users',
+    slug: 'query-active-mature-users',
+    description: `Write a query to find users from the \`users\` collection where \`age\` is greater than 25.
+
+You can write this as a raw query (e.g. \`db.users.find(...)\`) or as an asynchronous function.
+
+### Example:
+**Input:**
+\`users\` collection:
+| name     | age |
+|----------|-----|
+| John Doe | 30  |
+| Alice    | 20  |
+
+**Output:**
+\`[ { "name": "John Doe", "age": 30 } ]\``,
+    difficulty: 'EASY',
+    category: 'MONGODB',
+    starterCode: `// Write your raw MongoDB query or async function here
+// e.g. db.users.find(...)`,
+    solutionCode: `db.users.find({ age: { $gt: 25 } })`,
+    tags: ['mongodb', 'find'],
+    isPublished: true,
+    order: 718,
+    testCases: [
+      {
+        input: '{"users":[{"_id":1,"name":"John Doe","age":30},{"_id":2,"name":"Alice","age":20}]}',
+        expectedOutput: '[{"_id":1,"name":"John Doe","age":30}]',
+        isHidden: false,
+        order: 1,
+      },
+      {
+        input: '{"users":[{"_id":1,"name":"Bob","age":24},{"_id":2,"name":"Charlie","age":28}]}',
+        expectedOutput: '[{"_id":2,"name":"Charlie","age":28}]',
+        isHidden: true,
+        order: 2,
       },
     ],
   },
