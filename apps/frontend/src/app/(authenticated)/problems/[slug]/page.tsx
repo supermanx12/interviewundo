@@ -412,6 +412,7 @@ export default function ProblemWorkspacePage() {
           <div className="hidden sm:flex items-center gap-1 bg-muted/40 border border-border px-2 py-1 rounded-lg">
             <Settings size={13} className="text-muted-foreground" />
             <select
+              aria-label="Editor font size"
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
               className="bg-transparent text-[11px] font-semibold outline-none cursor-pointer pr-1"

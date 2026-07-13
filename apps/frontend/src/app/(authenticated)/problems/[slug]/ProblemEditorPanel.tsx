@@ -20,6 +20,7 @@ function CopyButton({ text }: { text: string }) {
       onClick={handleCopy}
       className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/85 transition-all active:scale-90 cursor-pointer flex items-center justify-center border-none bg-transparent"
       title="Copy to clipboard"
+      aria-label="Copy to clipboard"
     >
       {copied ? (
         <Check size={13} className="text-emerald-500 animate-in zoom-in duration-200" />

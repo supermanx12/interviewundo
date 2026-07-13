@@ -38,7 +38,7 @@ export function RecentSubmissions({ recent }: RecentSubmissionsProps) {
             No submissions yet. Start coding to build history!
           </div>
         ) : (
-          recent.map((sub, idx) => {
+          recent.map((sub) => {
             const statusColors = {
               ACCEPTED: 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10',
               WRONG_ANSWER: 'text-red-500 border-red-500/20 bg-red-500/10',
@@ -51,7 +51,7 @@ export function RecentSubmissions({ recent }: RecentSubmissionsProps) {
 
             return (
               <div
-                key={idx}
+                key={sub.id}
                 className="flex items-center justify-between p-3 rounded-2xl border border-border hover:bg-secondary transition-all duration-200 group"
               >
                 <div className="space-y-1 min-w-0 flex-1 pr-3">

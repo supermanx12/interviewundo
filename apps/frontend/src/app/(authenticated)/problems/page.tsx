@@ -127,6 +127,7 @@ export default function ProblemsPage() {
             {/* Difficulty Filter */}
             <div className="w-full md:w-48">
               <select
+                aria-label="Filter by difficulty"
                 className="w-full h-11 rounded-xl border border-border bg-background/50 px-3.5 text-sm font-medium text-foreground outline-none focus:border-ring transition-colors cursor-pointer"
                 value={difficulty}
                 onChange={(e) => {

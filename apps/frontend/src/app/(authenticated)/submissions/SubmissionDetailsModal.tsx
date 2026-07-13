@@ -297,6 +297,7 @@ export function SubmissionDetailsModal({
                     </div>
                   ) : (
                     <select
+                      aria-label="Compare with previous submission"
                       className="w-full h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground outline-none cursor-pointer focus:border-ring"
                       value={compareWithId || ''}
                       onChange={(e) => setCompareWithId(e.target.value || null)}

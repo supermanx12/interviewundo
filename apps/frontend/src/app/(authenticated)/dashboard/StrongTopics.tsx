@@ -19,8 +19,8 @@ export function StrongTopics() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
-        {topics.map((topic, idx) => (
-          <div key={idx} className="space-y-2 group">
+        {topics.map((topic) => (
+          <div key={topic.name} className="space-y-2 group">
             <div className="flex items-center justify-between text-sm">
               <span className="font-semibold text-card-foreground group-hover:opacity-80 transition-opacity">
                 {topic.name}

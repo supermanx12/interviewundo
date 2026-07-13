@@ -45,10 +45,10 @@ export function QuickActions() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {actions.map((action, idx) => {
+      {actions.map((action) => {
         const Icon = action.icon;
         return (
-          <Link href={action.href} key={idx} className="block group">
+          <Link href={action.href} key={action.label} className="block group">
             <Card
               className={`h-full bg-card border-border rounded-[16px] shadow-sm hover:shadow-md transition-all duration-300 ${action.hoverBorder} hover:-translate-y-1`}
             >

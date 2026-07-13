@@ -143,6 +143,7 @@ export default function RegisterForm() {
                 className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#868f97] hover:text-[#ffffff] transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isSubmitting}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>

@@ -192,6 +192,7 @@ export default function SubmissionsPage() {
           {/* Status Dropdown */}
           <div className="w-full md:w-56">
             <select
+              aria-label="Filter by status"
               className="w-full h-11 rounded-xl border border-border bg-background/50 px-3.5 text-sm font-medium text-foreground outline-none focus:border-ring transition-colors cursor-pointer"
               value={statusFilter}
               onChange={(e) => {

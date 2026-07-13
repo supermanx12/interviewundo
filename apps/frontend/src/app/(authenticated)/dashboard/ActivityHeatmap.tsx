@@ -83,8 +83,12 @@ export function ActivityHeatmap({ activity }: ActivityHeatmapProps) {
         <div className="flex flex-col">
           {/* Month Headers */}
           <div className="flex gap-[4.5px] text-[10px] font-medium text-muted-foreground h-4 pl-6 relative">
-            {calendarData.monthLabels.map((lbl, idx) => (
-              <div key={idx} className="absolute" style={{ left: `${lbl.index * 13.5 + 24}px` }}>
+            {calendarData.monthLabels.map((lbl) => (
+              <div
+                key={`${lbl.text}-${lbl.index}`}
+                className="absolute"
+                style={{ left: `${lbl.index * 13.5 + 24}px` }}
+              >
                 {lbl.text}
               </div>
             ))}
@@ -103,14 +107,17 @@ export function ActivityHeatmap({ activity }: ActivityHeatmapProps) {
             <div className="flex-1 overflow-x-auto pb-2 scrollbar-thin select-none">
               <div className="flex gap-[2px]">
                 {calendarData.weeks.map((week, wIdx) => (
-                  <div key={wIdx} className="flex flex-col gap-[2px]">
-                    {week.map((day, dIdx) => {
+                  <div
+                    key={week[0]?.toISOString().split('T')[0] ?? wIdx}
+                    className="flex flex-col gap-[2px]"
+                  >
+                    {week.map((day) => {
                       const dateStr = day.toISOString().split('T')[0];
                       const count = calendarData.activityMap[dateStr] || 0;
                       const colorClass = getCellColor(count);
                       return (
                         <div
-                          key={dIdx}
+                          key={dateStr}
                           className={cn(
                             'w-[10px] h-[10px] rounded-[1.5px] transition-all hover:scale-125 cursor-pointer relative group',
                             colorClass,

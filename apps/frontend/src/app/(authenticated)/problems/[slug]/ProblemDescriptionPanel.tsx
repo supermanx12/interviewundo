@@ -37,6 +37,7 @@ function CopyButton({ text }: { text: string }) {
       onClick={handleCopy}
       className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/80 transition-all active:scale-90 cursor-pointer flex items-center justify-center border-none bg-transparent"
       title="Copy to clipboard"
+      aria-label="Copy to clipboard"
     >
       {copied ? (
         <Check size={13} className="text-emerald-500 animate-in zoom-in duration-200" />
@@ -192,7 +193,7 @@ export function ProblemDescriptionPanel({
 
                 return (
                   <div
-                    key={idx}
+                    key={`hint-${hintText.slice(0, 30)}`}
                     className={cn(
                       'border rounded-2xl p-4 transition-all duration-200 shadow-sm relative overflow-hidden',
                       isUnlocked

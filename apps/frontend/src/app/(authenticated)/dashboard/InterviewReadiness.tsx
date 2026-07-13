@@ -45,8 +45,8 @@ export function InterviewReadiness() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  {data.map((entry) => (
+                    <Cell key={entry.name} fill={COLORS[data.indexOf(entry) % COLORS.length]} />
                   ))}
                 </Pie>
               </PieChart>
@@ -62,8 +62,8 @@ export function InterviewReadiness() {
           </div>
 
           <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {metrics.map((metric, idx) => (
-              <div key={idx} className="space-y-2">
+            {metrics.map((metric) => (
+              <div key={metric.label} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-semibold text-[12px] text-muted-foreground">
                     {metric.label}

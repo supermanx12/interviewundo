@@ -50,8 +50,8 @@ export function WeeklyGoal() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  {data.map((entry) => (
+                    <Cell key={entry.name} fill={COLORS[data.indexOf(entry) % COLORS.length]} />
                   ))}
                 </Pie>
               </PieChart>

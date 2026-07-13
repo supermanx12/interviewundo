@@ -274,11 +274,11 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {statsGridData.map((stat, idx) => {
+        {statsGridData.map((stat) => {
           const Icon = stat.icon;
           return (
             <Card
-              key={idx}
+              key={stat.label}
               className="bg-card border-border rounded-[16px] shadow-sm hover:border-border transition-all duration-300"
             >
               <CardContent className="p-6 flex items-center justify-between">
@@ -353,9 +353,14 @@ export default function DashboardPage() {
                     }}
                   />
                   <Bar dataKey="percentage" radius={[0, 8, 8, 0]} barSize={16}>
-                    {rechartsData.map((entry, index) => {
+                    {rechartsData.map((entry) => {
                       const colors = ['#479ffa', '#4ebe96', '#ffa16c', '#ffffff'];
-                      return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                      return (
+                        <Cell
+                          key={entry.name}
+                          fill={colors[rechartsData.indexOf(entry) % colors.length]}
+                        />
+                      );
                     })}
                   </Bar>
                 </BarChart>

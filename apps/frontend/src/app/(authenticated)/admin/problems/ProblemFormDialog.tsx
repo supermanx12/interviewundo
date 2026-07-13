@@ -112,6 +112,7 @@ export function ProblemFormDialog({
                 Topic Subject
               </label>
               <select
+                aria-label="Topic Subject"
                 className="w-full h-10 rounded-xl border border-border bg-background/50 px-3.5 text-sm font-medium outline-none focus:border-rose-500 transition-colors"
                 value={formCategory}
                 onChange={(e) => setFormCategory(e.target.value as any)}
@@ -133,6 +134,7 @@ export function ProblemFormDialog({
                 Difficulty Level
               </label>
               <select
+                aria-label="Difficulty Level"
                 className="w-full h-10 rounded-xl border border-border bg-background/50 px-3.5 text-sm font-medium outline-none focus:border-rose-500 transition-colors"
                 value={formDifficulty}
                 onChange={(e) => setFormDifficulty(e.target.value as any)}
@@ -200,6 +202,7 @@ export function ProblemFormDialog({
               rows={6}
               value={formStarterCode}
               onChange={(e) => setFormStarterCode(e.target.value)}
+              aria-label="Starter Code Template"
               className="w-full rounded-xl border border-border bg-background/50 p-3 text-xs outline-none focus:border-rose-500 transition-all font-mono leading-relaxed"
             />
           </div>

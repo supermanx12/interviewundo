@@ -14,7 +14,6 @@
     "@base-ui/react": "^1.6.0",
     "@hookform/resolvers": "^5.4.0",
     "@interviewprep/shared-types": "*",
-    "@interviewprep/shared-utils": "*",
     "@monaco-editor/react": "^4.7.0",
     "@next/third-parties": "^16.2.10",
     "@react-three/drei": "^10.7.7",

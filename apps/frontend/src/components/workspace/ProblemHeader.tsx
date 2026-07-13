@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -179,6 +179,7 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
                   'text-rose-500 border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/10 hover:text-rose-400',
               )}
               title={isLiked ? 'Unlike' : 'Like'}
+              aria-label={isLiked ? 'Unlike' : 'Like'}
             >
               <Heart
                 size={16}
@@ -192,6 +193,7 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
               onClick={handleShare}
               className="p-2 rounded-lg border border-zinc-800/60 hover:bg-zinc-800/40 hover:border-zinc-700/80 active:scale-95 transition-all text-zinc-400 hover:text-zinc-200 cursor-pointer bg-transparent"
               title="Share"
+              aria-label="Share"
             >
               <Share2 size={16} />
             </button>
@@ -205,6 +207,7 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
                   'text-amber-500 border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 hover:text-amber-400',
               )}
               title={isBookmarked ? 'Remove Bookmark' : 'Bookmark'}
+              aria-label={isBookmarked ? 'Remove Bookmark' : 'Bookmark'}
             >
               <Bookmark size={16} fill={isBookmarked ? 'currentColor' : 'none'} />
             </button>
