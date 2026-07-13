@@ -371,23 +371,6 @@ export default function ProblemWorkspacePage() {
             <ChevronLeft size={16} />
             Back
           </Button>
-          <div className="h-4 w-px bg-border hidden sm:block" />
-          <h1 className="text-base font-bold truncate max-w-[200px] sm:max-w-xs">
-            {problem.title}
-          </h1>
-          <DifficultyBadge difficulty={problem.difficulty} />
-          {problem.tags && problem.tags.length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {problem.tags.map((t) => (
-                <span
-                  key={t}
-                  className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 capitalize"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Editor Controls */}
@@ -439,17 +422,6 @@ export default function ProblemWorkspacePage() {
               <option value="18">18px</option>
             </select>
           </div>
-
-          {/* Theme Selector */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setEditorTheme(editorTheme === 'vs-dark' ? 'light' : 'vs-dark')}
-            className="h-8.5 text-xs font-semibold rounded-lg border-border"
-          >
-            {editorTheme === 'vs-dark' ? 'Light Theme' : 'Dark Theme'}
-          </Button>
 
           {/* Reset Code */}
           <Button
