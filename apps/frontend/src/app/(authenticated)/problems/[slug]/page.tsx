@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -9,6 +9,7 @@ import { DifficultyBadge } from '@/components/ui/difficulty-badge';
 import { ChevronLeft, RotateCcw, Settings, HelpCircle, Play, Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ReactWorkspace from '@/components/workspace/ReactWorkspace';
+import { Problem } from '@interviewprep/shared-types';
 import { ProblemDescriptionPanel } from './ProblemDescriptionPanel';
 import { ProblemEditorPanel } from './ProblemEditorPanel';
 
@@ -122,26 +123,7 @@ export default function ProblemWorkspacePage() {
   } = useQuery({
     queryKey: ['problem', slug],
     queryFn: async () => {
-      return apiFetch<{
-        id: string;
-        title: string;
-        slug: string;
-        description: string;
-        difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-        category: string;
-        starterCode: string;
-        solvedCount: number;
-        attemptCount: number;
-        tags?: string[];
-        solutionCode?: string | null;
-        testCases?: Array<{
-          id: string;
-          input: string;
-          expectedOutput: string;
-          isHidden: boolean;
-          order: number;
-        }>;
-      }>(`/api/problems/${slug}`);
+      return apiFetch<Problem>(`/api/problems/${slug}`);
     },
   });
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAuth } from '@/providers';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,56 +41,59 @@ export default function ProblemsPage() {
   >('ALL');
   const [tag, setTag] = useState<string>('ALL');
   const [difficulty, setDifficulty] = useState<'ALL' | 'EASY' | 'MEDIUM' | 'HARD'>('ALL');
-  const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = 15;
 
   // Debounce search input to avoid hitting database on every keystroke
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1); // Reset page on search
     }, 400);
 
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch problems using React Query
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['problems', { search: debouncedSearch, category, tag, difficulty, page }],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (debouncedSearch) params.set('search', debouncedSearch);
-      if (category !== 'ALL') params.set('category', category);
-      if (tag !== 'ALL') params.set('tag', tag);
-      if (difficulty !== 'ALL') params.set('difficulty', difficulty);
-      params.set('page', page.toString());
-      params.set('limit', limit.toString());
+  // Fetch problems using React Query Infinite Query
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['problems', { search: debouncedSearch, category, tag, difficulty }],
+      queryFn: async ({ pageParam = 1 }) => {
+        const params = new URLSearchParams();
+        if (debouncedSearch) params.set('search', debouncedSearch);
+        if (category !== 'ALL') params.set('category', category);
+        if (tag !== 'ALL') params.set('tag', tag);
+        if (difficulty !== 'ALL') params.set('difficulty', difficulty);
+        params.set('page', pageParam.toString());
+        params.set('limit', limit.toString());
 
-      return apiFetch<{
-        data: Array<{
-          id: string;
-          title: string;
-          slug: string;
-          difficulty: string;
-          category: string;
-          solvedCount: number;
-          attemptCount: number;
-          tags?: string[];
-        }>;
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-      }>(`/api/problems?${params.toString()}`);
-    },
-  });
+        return apiFetch<{
+          data: Array<{
+            id: string;
+            title: string;
+            slug: string;
+            difficulty: string;
+            category: string;
+            solvedCount: number;
+            attemptCount: number;
+            tags?: string[];
+          }>;
+          total: number;
+          page: number;
+          limit: number;
+          totalPages: number;
+        }>(`/api/problems?${params.toString()}`);
+      },
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        return lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined;
+      },
+      staleTime: 5 * 60 * 1000,
+    });
 
   const handleReset = () => {
     setSearch('');
     setCategory('ALL');
     setTag('ALL');
     setDifficulty('ALL');
-    setPage(1);
   };
 
   return (
@@ -128,7 +131,6 @@ export default function ProblemsPage() {
                 value={difficulty}
                 onChange={(e) => {
                   setDifficulty(e.target.value as any);
-                  setPage(1);
                 }}
               >
                 <option value="ALL">All Difficulties</option>
@@ -166,7 +168,6 @@ export default function ProblemsPage() {
                       type="button"
                       onClick={() => {
                         setCategory(cat.value);
-                        setPage(1);
                       }}
                       className={cn(
                         'px-4 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all active:scale-95 border cursor-pointer select-none',
@@ -196,7 +197,6 @@ export default function ProblemsPage() {
                       type="button"
                       onClick={() => {
                         setTag(t.value);
-                        setPage(1);
                       }}
                       className={cn(
                         'px-4 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all active:scale-95 border cursor-pointer select-none',
@@ -221,8 +221,9 @@ export default function ProblemsPage() {
           isLoading={isLoading}
           isError={isError}
           data={data}
-          page={page}
-          setPage={setPage}
+          fetchNextPage={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
           handleReset={handleReset}
         />
       </Card>
