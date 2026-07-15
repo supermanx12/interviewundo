@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Typed from 'typed.js';
 import gsap from 'gsap';
 import { motion, AnimatePresence } from 'motion/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Play, CheckCircle2 } from 'lucide-react';
 import { SHOWCASE_PROBLEMS, type ShowcaseProblem } from './showcase-problems';
 import { highlightCodesBatch } from '@/lib/shiki-highlighter';
 
@@ -23,6 +23,27 @@ export function ProductShowcase() {
   const [isIntersecting, setIsIntersecting] = useState(true);
   const isIntersectingRef = useRef(true);
   const typingPhaseRef = useRef<'TYPING' | 'PAUSED' | 'ERASING'>('PAUSED');
+
+  const triggerRunCycle = () => {
+    if (phase === 'RUNNING') return;
+
+    const currentProblem = problems[currentIndex];
+    const targetHtml = currentProblem.highlightedHtml || currentProblem.code;
+
+    if (typedRef.current) {
+      typedRef.current.destroy();
+      typedRef.current = null;
+    }
+    if (editorRef.current) {
+      editorRef.current.innerHTML = targetHtml;
+    }
+    typingPhaseRef.current = 'PAUSED';
+
+    if (tlRef.current) {
+      tlRef.current.seek('runStart');
+      tlRef.current.play();
+    }
+  };
 
   // Pre-highlight Shiki tokens on mount
   useEffect(() => {
@@ -139,6 +160,7 @@ export function ProductShowcase() {
     tl.to({}, { duration: 0.8 });
 
     // Phase 3: Show "Running..."
+    tl.addLabel('runStart');
     tl.call(() => setPhase('RUNNING'));
     tl.to({}, { duration: 1.2 });
 
@@ -147,13 +169,33 @@ export function ProductShowcase() {
     tl.to({}, { duration: 2.5 });
 
     // Phase 5: Erase code
+    tl.addLabel('eraseStart');
     tl.call(() => {
-      if (typedRef.current) {
-        typingPhaseRef.current = 'ERASING';
+      if (!editorRef.current) return;
+      typingPhaseRef.current = 'ERASING';
+
+      if (!typedRef.current) {
+        const currentProblem = problems[currentIndex];
+        const targetHtml = currentProblem.highlightedHtml || currentProblem.code;
+        typedRef.current = new Typed(editorRef.current, {
+          strings: [targetHtml, ''],
+          typeSpeed: 0,
+          backSpeed: 16,
+          contentType: 'html',
+          showCursor: true,
+          cursorChar: '▋',
+          onComplete: () => {
+            typingPhaseRef.current = 'PAUSED';
+            tlRef.current?.resume();
+          },
+        });
         typedRef.current.start();
-        if (!isIntersectingRef.current) {
-          typedRef.current.stop();
-        }
+      } else {
+        typedRef.current.start();
+      }
+
+      if (!isIntersectingRef.current && typedRef.current) {
+        typedRef.current.stop();
       }
     });
 
@@ -291,79 +333,110 @@ export function ProductShowcase() {
                 </motion.div>
               </AnimatePresence>
 
-              <div className="text-white text-sm font-semibold mb-3">Submission Result</div>
-              <div className="min-h-[92px] flex items-center">
-                <AnimatePresence mode="wait">
-                  {phase === 'HIDDEN' && (
-                    <motion.div
-                      key="hidden"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.4 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="w-full bg-[#0b0b0b]/40 border border-white/5 rounded-[10px] p-4 text-[#868f97] text-xs flex items-center justify-center italic"
-                    >
-                      Waiting for code execution...
-                    </motion.div>
-                  )}
-                  {phase === 'RUNNING' && (
-                    <motion.div
-                      key="running"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.3 }}
-                      className="w-full bg-[#479ffa]/5 border border-[#479ffa]/20 rounded-[10px] p-4 flex items-center gap-3"
-                    >
-                      <Loader2 className="w-5 h-5 text-[#479ffa] animate-spin shrink-0" />
-                      <div>
-                        <div className="text-[#479ffa] font-medium text-sm">
-                          Running test cases...
-                        </div>
-                        <div className="text-[#868f97] text-xs mt-0.5">
-                          Executing against 42 test cases in sandbox
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                  {phase === 'RESULT' && (
-                    <motion.div
-                      key="result"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-                      className="w-full bg-[#4ebe96]/5 border border-[#4ebe96]/20 rounded-[10px] p-4 flex flex-col gap-4 result-glow"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#4ebe96] shadow-[0_0_8px_#4ebe96]" />
-                        <span className="text-[#4ebe96] font-medium text-sm">Accepted</span>
-                      </div>
-                      <div className="flex gap-8 text-sm">
-                        <motion.div
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.1, duration: 0.2 }}
-                        >
-                          <div className="text-[#868f97] text-xs">Runtime</div>
-                          <div className="text-white font-mono mt-1">
-                            {currentProblem.result.runtime}
-                          </div>
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2, duration: 0.2 }}
-                        >
-                          <div className="text-[#868f97] text-xs">Memory</div>
-                          <div className="text-white font-mono mt-1">
-                            {currentProblem.result.memory}
-                          </div>
-                        </motion.div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <AnimatePresence mode="wait">
+                {phase !== 'HIDDEN' && (
+                  <motion.div
+                    key="submission-result-section"
+                    initial={{ opacity: 0, height: 0, y: 12 }}
+                    animate={{ opacity: 1, height: 'auto', y: 0 }}
+                    exit={{ opacity: 0, height: 0, y: 12 }}
+                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                    className="overflow-hidden mt-6"
+                  >
+                    <div className="text-white text-sm font-semibold mb-3">Submission Result</div>
+                    <div className="min-h-[92px] flex items-center">
+                      <AnimatePresence mode="wait">
+                        {phase === 'RUNNING' && (
+                          <motion.div
+                            key="running"
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.3 }}
+                            className="w-full bg-[#479ffa]/5 border border-[#479ffa]/20 rounded-[10px] p-4 flex items-center gap-3"
+                          >
+                            <Loader2 className="w-5 h-5 text-[#479ffa] animate-spin shrink-0" />
+                            <div>
+                              <div className="text-[#479ffa] font-medium text-sm">
+                                Running test cases...
+                              </div>
+                              <div className="text-[#868f97] text-xs mt-0.5">
+                                Executing against 42 test cases in sandbox
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                        {phase === 'RESULT' && (
+                          <motion.div
+                            key="result"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                            className="w-full bg-[#4ebe96]/5 border border-[#4ebe96]/20 rounded-[10px] p-4 flex flex-col gap-4 result-glow"
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-[#4ebe96] shadow-[0_0_8px_#4ebe96]" />
+                              <span className="text-[#4ebe96] font-medium text-sm">Accepted</span>
+                            </div>
+                            <div className="flex gap-8 text-sm">
+                              <motion.div
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1, duration: 0.2 }}
+                              >
+                                <div className="text-[#868f97] text-xs">Runtime</div>
+                                <div className="text-white font-mono mt-1">
+                                  {currentProblem.result.runtime}
+                                </div>
+                              </motion.div>
+                              <motion.div
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.2 }}
+                              >
+                                <div className="text-[#868f97] text-xs">Memory</div>
+                                <div className="text-white font-mono mt-1">
+                                  {currentProblem.result.memory}
+                                </div>
+                              </motion.div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Mobile Action Bar (< lg) */}
+            <div className="lg:hidden h-14 border-t border-[#525252]/30 bg-[#131313] px-4 flex items-center justify-end gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={triggerRunCycle}
+                disabled={phase === 'RUNNING'}
+                className="px-3.5 py-1.5 rounded-[8px] bg-[#191919] hover:bg-[#252525] active:scale-95 text-[#cccccc] hover:text-white text-xs font-medium border border-white/10 transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+              >
+                {phase === 'RUNNING' ? (
+                  <Loader2 className="w-3.5 h-3.5 text-[#479ffa] animate-spin" />
+                ) : (
+                  <Play className="w-3.5 h-3.5 text-[#479ffa] fill-[#479ffa]/20" />
+                )}
+                Run Code
+              </button>
+              <button
+                type="button"
+                onClick={triggerRunCycle}
+                disabled={phase === 'RUNNING'}
+                className="px-4 py-1.5 rounded-[8px] bg-[#4ebe96]/15 hover:bg-[#4ebe96]/25 active:scale-95 text-[#4ebe96] hover:text-white text-xs font-semibold border border-[#4ebe96]/30 transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_12px_rgba(78,190,150,0.15)] cursor-pointer"
+              >
+                {phase === 'RUNNING' ? (
+                  <Loader2 className="w-3.5 h-3.5 text-[#4ebe96] animate-spin" />
+                ) : (
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                )}
+                Submit
+              </button>
             </div>
           </div>
 
@@ -377,19 +450,52 @@ export function ProductShowcase() {
               <div ref={editorRef} className="showcase-editor text-sm font-mono overflow-hidden" />
             </div>
 
-            {/* Floating Execution Badge */}
-            <motion.div
-              animate={
-                phase === 'RESULT'
-                  ? { scale: [1, 1.06, 1], borderColor: 'rgba(78, 190, 150, 0.4)' }
-                  : { scale: 1, borderColor: 'rgba(255, 255, 255, 0.1)' }
-              }
-              transition={{ duration: 0.4 }}
-              className="absolute bottom-6 right-6 px-4 py-2 bg-[#131313] border rounded-full shadow-lg flex items-center gap-3 z-20"
-            >
-              <div className="w-2 h-2 rounded-full bg-[#4ebe96] shadow-[0_0_8px_#4ebe96] animate-pulse" />
-              <span className="text-[#cccccc] text-xs font-mono">Node.js 22 Running</span>
-            </motion.div>
+            {/* Code Editor Bottom Action Bar (>= lg) */}
+            <div className="h-14 border-t border-[#525252]/30 bg-[#131313] px-4 flex items-center justify-between shrink-0 z-10">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={
+                    phase === 'RESULT'
+                      ? { scale: [1, 1.06, 1], borderColor: 'rgba(78, 190, 150, 0.4)' }
+                      : { scale: 1, borderColor: 'rgba(255, 255, 255, 0.1)' }
+                  }
+                  transition={{ duration: 0.4 }}
+                  className="px-3 py-1.5 bg-[#0b0b0b] border rounded-full flex items-center gap-2 shadow-inner"
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#4ebe96] shadow-[0_0_8px_#4ebe96] animate-pulse" />
+                  <span className="text-[#cccccc] text-xs font-mono">Node.js 22</span>
+                </motion.div>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={triggerRunCycle}
+                  disabled={phase === 'RUNNING'}
+                  className="px-3.5 py-1.5 rounded-[8px] bg-[#191919] hover:bg-[#252525] active:scale-95 text-[#cccccc] hover:text-white text-xs font-medium border border-white/10 transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+                >
+                  {phase === 'RUNNING' ? (
+                    <Loader2 className="w-3.5 h-3.5 text-[#479ffa] animate-spin" />
+                  ) : (
+                    <Play className="w-3.5 h-3.5 text-[#479ffa] fill-[#479ffa]/20" />
+                  )}
+                  Run Code
+                </button>
+                <button
+                  type="button"
+                  onClick={triggerRunCycle}
+                  disabled={phase === 'RUNNING'}
+                  className="px-4 py-1.5 rounded-[8px] bg-[#4ebe96]/15 hover:bg-[#4ebe96]/25 active:scale-95 text-[#4ebe96] hover:text-white text-xs font-semibold border border-[#4ebe96]/30 transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_12px_rgba(78,190,150,0.15)] cursor-pointer"
+                >
+                  {phase === 'RUNNING' ? (
+                    <Loader2 className="w-3.5 h-3.5 text-[#4ebe96] animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  )}
+                  Submit
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
