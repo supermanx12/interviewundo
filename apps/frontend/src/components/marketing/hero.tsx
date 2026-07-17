@@ -2,7 +2,22 @@ import Link from 'next/link';
 import Beams from '@/components/ui/Beams';
 import { Component as TrustedDevelopersBadge } from '@/components/ui/avatar-demo';
 
-export function Hero() {
+async function getPublicStats(): Promise<{ userCount: number | null }> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+    const res = await fetch(`${apiUrl}/api/stats/public`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return { userCount: null };
+    return await res.json();
+  } catch {
+    return { userCount: null };
+  }
+}
+
+export async function Hero() {
+  const stats = await getPublicStats();
+
   return (
     <section className="relative flex flex-col items-center text-center pt-24 pb-20 px-6 max-w-[1200px] mx-auto w-full">
       <div className="absolute inset-0 pointer-events-none z-0 w-full h-[800px] overflow-hidden [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]">
@@ -21,7 +36,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 mb-6">
-        <TrustedDevelopersBadge />
+        <TrustedDevelopersBadge initialCount={stats.userCount} />
       </div>
 
       <h1 className="relative z-10 text-5xl md:text-[54px] font-bold text-fey-white leading-[1.1] tracking-[-0.08em] max-w-3xl mb-6">

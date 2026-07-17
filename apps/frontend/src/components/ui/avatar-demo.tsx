@@ -27,7 +27,29 @@ const AVATARS = [
   },
 ];
 
-function Component() {
+interface TrustedDevelopersBadgeProps {
+  initialCount?: number | null;
+}
+
+function Component({ initialCount }: TrustedDevelopersBadgeProps = {}) {
+  const [userCount, setUserCount] = React.useState<number | null>(initialCount ?? null);
+
+  React.useEffect(() => {
+    if (initialCount !== undefined && initialCount !== null) return;
+
+    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+    fetch(`${apiUrl}/api/stats/public`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.userCount === 'number' && data.userCount > 0) {
+          setUserCount(data.userCount);
+        }
+      })
+      .catch(() => {
+        // Fallback silently if API is offline or unreachable
+      });
+  }, [initialCount]);
+
   return (
     <div className="flex items-center rounded-full border border-fey-mist/20 bg-[#131313]/80 backdrop-blur-md py-1.5 px-3 shadow-lg shadow-black/20">
       <div className="flex -space-x-2">
@@ -43,7 +65,11 @@ function Component() {
       <div className="flex items-center gap-1.5 px-2.5">
         <Users className="w-3.5 h-3.5 text-[#ffa16c]" />
         <p className="text-xs text-fey-graphite">
-          Trusted by <strong className="font-semibold text-fey-white">20+</strong> developers.
+          Trusted by{' '}
+          <strong className="font-semibold text-fey-white">
+            {userCount ? `${userCount.toLocaleString()}+` : '20+'}
+          </strong>{' '}
+          developers.
         </p>
       </div>
     </div>
