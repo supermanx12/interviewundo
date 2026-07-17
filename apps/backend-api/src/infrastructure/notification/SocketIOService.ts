@@ -64,8 +64,16 @@ export class SocketIOService implements INotificationService {
         if (channel === 'submission:updates') {
           try {
             const payload = JSON.parse(message);
-            const { userId, submissionId, status, data, error, userStreak, streakMilestone } =
-              payload;
+            const {
+              userId,
+              submissionId,
+              status,
+              data,
+              error,
+              userStreak,
+              streakMilestone,
+              runtimePercentile,
+            } = payload;
 
             logger.info(
               { userId, submissionId, status },
@@ -79,6 +87,7 @@ export class SocketIOService implements INotificationService {
               ...(error ? { error } : {}),
               ...(userStreak !== undefined ? { userStreak } : {}),
               ...(streakMilestone !== undefined ? { streakMilestone } : {}),
+              ...(runtimePercentile !== undefined ? { runtimePercentile } : {}),
             });
           } catch (err: any) {
             logger.error({ err: err.message, message }, 'Failed to parse Redis pub/sub message');

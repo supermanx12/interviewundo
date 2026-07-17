@@ -47,6 +47,8 @@ interface ProblemEditorPanelProps {
     stderr?: string;
     passed?: boolean;
     error?: string;
+    runtimePercentile?: number | null;
+    runtime?: number;
   } | null;
   handleRunCode: () => void;
   handleSubmitCode: () => void;
@@ -588,6 +590,14 @@ export function ProblemEditorPanel({
                   <pre className="p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-zinc-300 whitespace-pre-wrap leading-relaxed">
                     {consoleOutput.stdout || consoleOutput.error}
                   </pre>
+                  {consoleOutput.runtimePercentile != null &&
+                    (consoleOutput.status === 'ACCEPTED' || consoleOutput.status === 'SUCCESS') && (
+                      <div className="mt-3 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
+                        🏆 Your solution ran in {consoleOutput.runtime}ms — faster than{' '}
+                        <span className="font-bold">{consoleOutput.runtimePercentile}%</span> of all
+                        submissions!
+                      </div>
+                    )}
                 </div>
               ) : (
                 <div className="text-center text-zinc-500 py-10 select-none">

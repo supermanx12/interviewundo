@@ -54,7 +54,7 @@ export const submissionWorker = new Worker(
       const [problem, testCases] = await Promise.all([
         prisma.problem.findUnique({
           where: { id: problemId },
-          select: { category: true },
+          select: { category: true, slug: true },
         }),
         prisma.testCase.findMany({
           where: { problemId },
@@ -184,6 +184,28 @@ export const submissionWorker = new Worker(
           });
         }
 
+        // Calculate runtime percentile for ACCEPTED submissions
+        let runtimePercentile: number | null = null;
+        if (finalStatus === 'ACCEPTED' && execResult.runtime != null) {
+          const [totalAccepted, slowerOrEqual] = await Promise.all([
+            prisma.submissionResult.count({
+              where: { submission: { problemId, status: 'ACCEPTED' } },
+            }),
+            prisma.submissionResult.count({
+              where: {
+                submission: { problemId, status: 'ACCEPTED' },
+                runtime: { gte: execResult.runtime },
+              },
+            }),
+          ]);
+          // Edge case: if this is the very first accepted submission, default to a motivating value
+          runtimePercentile =
+            totalAccepted > 1 ? Math.round((slowerOrEqual / totalAccepted) * 100) : 90; // first solver gets a celebratory 90%
+        }
+
+        // Invalidate the cached problem response so stats are fresh on next page load
+        await redis.del(`problems:slug:${problem.slug}`).catch(() => {});
+
         // Calculate and update user streak
         let newStreak = 0;
         let streakMilestone: number | null = null;
@@ -233,6 +255,7 @@ export const submissionWorker = new Worker(
             error: execResult.error,
             userStreak: newStreak,
             streakMilestone,
+            runtimePercentile,
             data: {
               runtime: execResult.runtime,
               memory: execResult.memory,

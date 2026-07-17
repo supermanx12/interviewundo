@@ -41,6 +41,7 @@ export interface Problem {
   createdAt: Date;
   updatedAt: Date;
   testCases?: TestCase[];
+  activeSolversCount?: number;
 }
 
 // ============================================================

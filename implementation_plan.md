@@ -96,7 +96,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
 
 ### Tasks
 
-- [ ] **2.1 — Add `activeSolversCount` to the `Problem` shared type**
+- [x] **2.1 — Add `activeSolversCount` to the `Problem` shared type**
 
   File: [`packages/shared-types/src/entities/index.ts`](file:///d:/interviewUndo/packages/shared-types/src/entities/index.ts)
 
@@ -109,7 +109,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   }
   ```
 
-- [ ] **2.2 — Percentile Calculation in `SubmissionWorker.ts`**
+- [x] **2.2 — Percentile Calculation in `SubmissionWorker.ts`**
 
   File: [`SubmissionWorker.ts`](file:///d:/interviewUndo/apps/judge-worker/src/worker/SubmissionWorker.ts)
 
@@ -138,7 +138,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   > [!IMPORTANT]
   > Always use `Promise.all()` — never two sequential `await` calls here. This runs 2 COUNT queries in parallel to minimize latency added to every job.
 
-- [ ] **2.3 — Publish `runtimePercentile` in the Redis payload**
+- [x] **2.3 — Publish `runtimePercentile` in the Redis payload**
 
   File: [`SubmissionWorker.ts`](file:///d:/interviewUndo/apps/judge-worker/src/worker/SubmissionWorker.ts)
 
@@ -165,7 +165,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   );
   ```
 
-- [ ] **2.4 — Invalidate Problem Cache After Stat Updates**
+- [x] **2.4 — Invalidate Problem Cache After Stat Updates**
 
   File: [`SubmissionWorker.ts`](file:///d:/interviewUndo/apps/judge-worker/src/worker/SubmissionWorker.ts)
 
@@ -193,7 +193,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   > [!NOTE]
   > The `.catch(() => {})` silently swallows cache-delete errors — this is intentional. A failed cache invalidation is non-critical; the data will eventually expire on its own.
 
-- [ ] **2.5 — Display Percentile on Frontend Verdict Panel**
+- [x] **2.5 — Display Percentile on Frontend Verdict Panel**
 
   File: Wherever the real-time submission verdict is rendered (the panel that shows "ACCEPTED / runtime / memory").
 
@@ -210,7 +210,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   }
   ```
 
-- [ ] **2.6 — Verify Phase 2**
+- [x] **2.6 — Verify Phase 2**
   - Run `npm run typecheck` in `apps/judge-worker` and `apps/backend-api`
   - Submit an accepted solution and confirm the verdict panel shows percentile
   - Submit with a deliberately slow solution and confirm a lower percentile

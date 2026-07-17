@@ -4,6 +4,7 @@ import { vi, describe, it, expect, beforeEach, beforeAll } from 'vitest';
 (globalThis as any).mockTestCaseFindMany = vi.fn();
 (globalThis as any).mockSubmissionUpdate = vi.fn();
 (globalThis as any).mockSubmissionResultCreate = vi.fn();
+(globalThis as any).mockSubmissionResultCount = vi.fn();
 (globalThis as any).mockProblemUpdate = vi.fn();
 (globalThis as any).mockProblemFindUnique = vi.fn();
 (globalThis as any).mockUserFindUnique = vi.fn();
@@ -11,6 +12,7 @@ import { vi, describe, it, expect, beforeEach, beforeAll } from 'vitest';
 (globalThis as any).mockTransaction = vi.fn();
 (globalThis as any).mockRedisPublish = vi.fn();
 (globalThis as any).mockRedisSetex = vi.fn();
+(globalThis as any).mockRedisDel = vi.fn();
 (globalThis as any).mockExecute = vi.fn();
 
 // Mock dependencies using delegating functions that lookup globalThis registry values at invocation time
@@ -24,6 +26,7 @@ vi.mock('../config/database', () => ({
     },
     submissionResult: {
       create: (...args: any[]) => (globalThis as any).mockSubmissionResultCreate(...args),
+      count: (...args: any[]) => (globalThis as any).mockSubmissionResultCount(...args),
     },
     problem: {
       findUnique: (...args: any[]) => (globalThis as any).mockProblemFindUnique(...args),
@@ -41,6 +44,7 @@ vi.mock('../config/redis', () => ({
   redis: {
     publish: (...args: any[]) => (globalThis as any).mockRedisPublish(...args),
     setex: (...args: any[]) => (globalThis as any).mockRedisSetex(...args),
+    del: (...args: any[]) => (globalThis as any).mockRedisDel(...args),
   },
 }));
 
@@ -90,8 +94,12 @@ describe('SubmissionWorker Unit Tests', () => {
     (globalThis as any).mockTestCaseFindMany.mockResolvedValue(mockTestCases);
     (globalThis as any).mockSubmissionUpdate.mockResolvedValue({});
     (globalThis as any).mockSubmissionResultCreate.mockResolvedValue({});
+    (globalThis as any).mockSubmissionResultCount.mockResolvedValue(1);
     (globalThis as any).mockProblemUpdate.mockResolvedValue({});
-    (globalThis as any).mockProblemFindUnique.mockResolvedValue({ category: 'JAVASCRIPT' });
+    (globalThis as any).mockProblemFindUnique.mockResolvedValue({
+      category: 'JAVASCRIPT',
+      slug: 'two-sum',
+    });
     (globalThis as any).mockUserFindUnique.mockResolvedValue({
       streak: 1,
       lastActiveAt: new Date(),
@@ -99,6 +107,7 @@ describe('SubmissionWorker Unit Tests', () => {
     (globalThis as any).mockUserUpdate.mockResolvedValue({});
     (globalThis as any).mockRedisPublish.mockResolvedValue(1);
     (globalThis as any).mockRedisSetex.mockResolvedValue('OK');
+    (globalThis as any).mockRedisDel.mockResolvedValue(1);
     (globalThis as any).mockTransaction.mockImplementation(async (promises: any) =>
       Promise.all(promises),
     );

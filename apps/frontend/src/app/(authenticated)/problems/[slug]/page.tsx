@@ -113,6 +113,8 @@ export default function ProblemWorkspacePage() {
     stderr?: string;
     passed?: boolean;
     error?: string;
+    runtimePercentile?: number | null;
+    runtime?: number;
   } | null>(null);
 
   // Fetch Problem Details
@@ -181,6 +183,7 @@ export default function ProblemWorkspacePage() {
       error?: string;
       userStreak?: number;
       streakMilestone?: number | null;
+      runtimePercentile?: number | null;
     }) => {
       console.log('Received WebSocket submission:status update:', payload);
       if (payload.submissionId !== activeJobId) return;
@@ -252,6 +255,8 @@ export default function ProblemWorkspacePage() {
             (payload.status !== 'ACCEPTED' && payload.status !== 'Finished'
               ? 'Some test cases failed.'
               : undefined),
+          runtimePercentile: payload.runtimePercentile,
+          runtime: payload.data?.runtime,
         });
       }
     };
