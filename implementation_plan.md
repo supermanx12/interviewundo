@@ -224,7 +224,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
 
 ### Tasks
 
-- [ ] **3.1 — Fire-and-Forget Redis INCR in `ProblemController.ts`**
+- [x] **3.1 — Fire-and-Forget Redis INCR in `ProblemController.ts`**
 
   File: [`ProblemController.ts`](file:///d:/interviewUndo/apps/backend-api/src/presentation/controllers/ProblemController.ts)
 
@@ -252,7 +252,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   > [!IMPORTANT]
   > The INCR **must** happen in the controller, NOT inside `GetProblemBySlug.ts`. The use-case caches the response and returns early on cache hits — the side-effect would never fire.
 
-- [ ] **3.2 — Expose `GET /api/problems/:slug/active` Endpoint**
+- [x] **3.2 — Expose `GET /api/problems/:slug/active` Endpoint**
 
   For accurate real-time counts, create a **separate lightweight endpoint** that returns the active solver count from Redis. This avoids embedding volatile data in the cached problem response.
 
@@ -275,7 +275,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   };
   ```
 
-- [ ] **3.3 — Poll Active Count from Frontend `ProblemHeader.tsx`**
+- [x] **3.3 — Poll Active Count from Frontend `ProblemHeader.tsx`**
 
   File: [`ProblemHeader.tsx`](file:///d:/interviewUndo/apps/frontend/src/components/workspace/ProblemHeader.tsx)
 
@@ -317,7 +317,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
 
   > **Note:** Label as "solving now" or "viewing now" — not "solving right now" if the signal is just a page hit. Match copy to the tracking method you implement.
 
-- [ ] **3.4 — Verify Phase 3**
+- [x] **3.4 — Verify Phase 3**
   - Open a problem page and confirm the active counter appears
   - Open two browser tabs to the same problem and confirm the counter increments
   - Wait 5 minutes and confirm the counter resets to 0 (Redis TTL expired)

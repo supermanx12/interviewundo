@@ -61,6 +61,7 @@ model User {
 
   submissions Submission[]
   hintUsages  HintUsage[]
+  problemLikes ProblemLike[]
 
   @@index([email])
   @@index([githubId])
@@ -92,6 +93,7 @@ model Problem {
   testCases   TestCase[]
   submissions Submission[]
   hintUsages  HintUsage[]
+  likes       ProblemLike[]
 
   @@index([slug])
   @@index([category, difficulty])
@@ -170,4 +172,18 @@ model HintUsage {
 
   @@index([userId, problemId, createdAt])
   @@map("hint_usages")
+}
+
+model ProblemLike {
+  id        String   @id @default(cuid())
+  userId    String
+  problemId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+  @@index([problemId])
+  @@map("problem_likes")
 }

@@ -15,7 +15,7 @@ import {
   Terminal,
   Target,
 } from 'lucide-react';
-import { useToast } from '@/providers';
+import { useToast, useAuth } from '@/providers';
 import { Problem } from '@interviewprep/shared-types';
 import { cn } from '@/lib/utils';
 
@@ -103,9 +103,11 @@ const getDifficultyDetails = (difficulty: string) => {
 
 export function ProblemHeader({ problem }: ProblemHeaderProps) {
   const { success: showSuccess, error: showError } = useToast();
+  const { apiFetch } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [activeSolvers, setActiveSolvers] = useState<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -114,6 +116,21 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
     setIsLiked(!!liked[problem.slug]);
     setIsBookmarked(!!bookmarked[problem.slug]);
   }, [problem.slug]);
+
+  useEffect(() => {
+    const fetchActive = async () => {
+      try {
+        const data = await apiFetch<{ activeSolversCount: number }>(
+          `/api/problems/${problem.slug}/active`,
+        );
+        setActiveSolvers(data.activeSolversCount);
+      } catch {}
+    };
+
+    fetchActive(); // initial fetch
+    const interval = setInterval(fetchActive, 60_000); // poll every 60s
+    return () => clearInterval(interval);
+  }, [problem.slug, apiFetch]);
 
   const toggleLike = () => {
     const liked = JSON.parse(localStorage.getItem('liked_problems') || '{}');
@@ -286,6 +303,17 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
               <Target size={13} className="text-emerald-500 shrink-0" />
               <span className="text-emerald-400 font-semibold">{acceptanceRate}%</span>
               <span>accepted</span>
+            </div>
+          )}
+
+          {/* Active Solvers */}
+          {activeSolvers != null && activeSolvers > 0 && (
+            <div className="flex items-center gap-1 text-zinc-400/90" title="Solving right now">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span>{activeSolvers} solving now</span>
             </div>
           )}
 

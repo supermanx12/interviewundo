@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { redis } from '../../config/redis';
 import type { GetProblems } from '../../application/use-cases/problem/GetProblems';
 import type { GetProblemBySlug } from '../../application/use-cases/problem/GetProblemBySlug';
 import type { GetDailyChallenge } from '../../application/use-cases/problem/GetDailyChallenge';
@@ -31,9 +32,30 @@ export class ProblemController {
       const slug = req.params.slug as string;
       const problem = await this.getProblemBySlug.execute(slug);
 
+      // Fire-and-forget: track active page views in Redis (does NOT block response)
+      // For a true count: use INCR + EXPIRE separately
+      const activeKey = `problem:active:count:${slug}`;
+      redis
+        .incr(activeKey)
+        .then(() => redis.expire(activeKey, 300))
+        .catch(() => {});
+
       res.status(200).json({
         success: true,
         data: problem,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getActiveSolvers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const slug = req.params.slug as string;
+      const count = await redis.get(`problem:active:count:${slug}`);
+      res.status(200).json({
+        success: true,
+        data: { activeSolversCount: parseInt(count ?? '0', 10) },
       });
     } catch (error) {
       next(error);

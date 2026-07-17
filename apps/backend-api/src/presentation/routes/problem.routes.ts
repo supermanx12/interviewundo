@@ -21,6 +21,11 @@ problemRoutes.post('/:slug/hint', authenticate, (req, res, next) => {
   container.controllers.problemController.getHint(req, res, next);
 });
 
+// GET /api/problems/:slug/active
+problemRoutes.get('/:slug/active', (req, res, next) => {
+  container.controllers.problemController.getActiveSolvers(req, res, next);
+});
+
 // GET /api/problems/:slug
 problemRoutes.get('/:slug', (req, res, next) => {
   container.controllers.problemController.getBySlug(req, res, next);

@@ -98,6 +98,15 @@ describe('Problem Endpoints Integration', () => {
     expect(res.body.data.slug).toBe(problemSlug);
   });
 
+  it('should return active solvers count for a problem', async () => {
+    const res = await request(app).get(`/api/problems/${problemSlug}/active`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toHaveProperty('activeSolversCount');
+    expect(typeof res.body.data.activeSolversCount).toBe('number');
+  });
+
   it('should return the daily challenge', async () => {
     const res = await request(app).get('/api/problems/daily');
 
