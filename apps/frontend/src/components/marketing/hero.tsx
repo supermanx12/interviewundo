@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Beams from '@/components/ui/Beams';
 import { Component as TrustedDevelopersBadge } from '@/components/ui/avatar-demo';
+import { TechStackGroup } from '@/components/ui/avatar-group-demo';
 
 async function getPublicStats(): Promise<{ userCount: number | null }> {
   try {
@@ -43,11 +44,15 @@ export async function Hero() {
         Ace Full-Stack Interviews.
       </h1>
 
-      <p className="relative z-10 text-fey-graphite text-lg max-w-2xl mb-10 leading-relaxed">
+      <p className="relative z-10 text-fey-graphite text-lg max-w-2xl mb-8 leading-relaxed">
         Practice real interview questions, solve coding challenges in an integrated editor, execute
         solutions securely inside isolated environments, and track your progress through a beautiful
         analytics dashboard.
       </p>
+
+      <div className="relative z-10 mb-10">
+        <TechStackGroup />
+      </div>
 
       <div className="relative z-10 flex items-center gap-4">
         <Link
