@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema, type LoginDTO } from '@interviewprep/shared-types';
@@ -16,6 +16,8 @@ export default function LoginForm() {
   const { login } = useAuth();
   const { success: showSuccess, error: showError } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionExpired = searchParams.get('reason') === 'session_expired';
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,6 +60,17 @@ export default function LoginForm() {
       </div>
 
       <div className="px-8 pb-8">
+        {/* Session expiry notice — shown when user is redirected after token refresh failure */}
+        {sessionExpired && (
+          <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-start gap-3 text-sm">
+            <AlertCircle size={18} className="shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Your session expired</p>
+              <p className="text-amber-400/70 mt-0.5">Please sign in again to continue.</p>
+            </div>
+          </div>
+        )}
+
         {serverError && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-start gap-3 text-sm">
             <AlertCircle size={18} className="shrink-0 mt-0.5" />

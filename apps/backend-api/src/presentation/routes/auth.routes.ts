@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { container } from '../../container';
 import { validateRequest } from '../middleware/validate-request';
 import { validateSharedSecret } from '../middleware/validate-shared-secret';
+import { authRefreshLimiter } from '../middleware/rate-limiter';
 import { RegisterSchema, LoginSchema } from '@interviewprep/shared-types';
 
 // ============================================================
@@ -24,9 +25,16 @@ authRoutes.post('/login', validateRequest(LoginSchema), (req, res, next) => {
   container.controllers.authController.login(req, res, next);
 });
 
-authRoutes.post('/refreshToken', validateRequest(RefreshTokenSchema), (req, res, next) => {
-  container.controllers.authController.refresh(req, res, next);
-});
+// Use the lenient refresh limiter here — this endpoint is called automatically
+// every ~14 min by the client; the general 100-req limiter would lock users out.
+authRoutes.post(
+  '/refreshToken',
+  authRefreshLimiter,
+  validateRequest(RefreshTokenSchema),
+  (req, res, next) => {
+    container.controllers.authController.refresh(req, res, next);
+  },
+);
 
 const GithubAuthSchema = z.object({
   githubId: z.string().min(1, 'Github ID is required'),

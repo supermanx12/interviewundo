@@ -4,6 +4,11 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useSession, signOut } from 'next-auth/react';
 import type { LoginDTO, RegisterDTO, AuthResponseDTO } from '@interviewprep/shared-types';
 
+// ── Constants ───────────────────────────────────────────────────────────────
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+// Must match the backend route exactly: POST /api/auth/refreshToken
+const REFRESH_URL = `${BACKEND_URL}/api/auth/refreshToken`;
+
 interface User {
   id: string;
   name: string;
@@ -24,7 +29,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+// BACKEND_URL and REFRESH_URL are defined at module level above
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -46,7 +51,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshSession = useCallback(
     async (existingRefreshToken: string) => {
       try {
-        const response = await fetch(`${BACKEND_URL}/api/auth/refreshToken`, {
+        // Use REFRESH_URL (module-level constant) — matches backend route exactly
+        const response = await fetch(REFRESH_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken: existingRefreshToken }),
@@ -60,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setToken(accessToken);
           localStorage.setItem('refreshToken', newRefreshToken);
 
-          // Restore user from localStorage if it's there
+          // Restore user from localStorage if present
           const storedUser = localStorage.getItem('user');
           if (storedUser) {
             setUser(JSON.parse(storedUser));
@@ -70,12 +76,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error('Invalid refresh response structure');
         }
       } catch (err) {
+        console.warn('[AuthProvider] Token refresh failed, logging out:', err);
         logout();
         return null;
       }
     },
     [logout],
   );
+
+  // ── Server-side refresh failure detection ──────────────────────────────────
+  // When NextAuth's server-side jwt() callback fails to refresh the token,
+  // it sets session.error = 'RefreshAccessTokenError'. We detect that here
+  // and force a full logout so the user gets a clean re-login prompt instead
+  // of the broken "logged-in but 401" ghost state.
+  const { data: sessionForError } = useSession();
+  useEffect(() => {
+    if (
+      sessionForError?.error === 'RefreshAccessTokenError' ||
+      sessionForError?.error === 'BackendAuthFailed'
+    ) {
+      console.warn(
+        '[AuthProvider] Session error detected, forcing re-authentication:',
+        sessionForError.error,
+      );
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      setUser(null);
+      setToken(null);
+      signOut({ callbackUrl: '/login?reason=session_expired' });
+    }
+  }, [sessionForError?.error]);
 
   // Helper to check if a JWT access token is expired or expiring in <= 15 seconds
   const isJwtExpired = (jwtToken: string): boolean => {
@@ -134,17 +164,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [token, refreshSession]);
 
-  // Initial boot check
+  // Initial boot check — only for credential-based (non-OAuth) users
   useEffect(() => {
     const initializeAuth = async () => {
       if (sessionStatus === 'loading') return;
+      // OAuth users are handled by the syncSession effect above
       if (sessionStatus === 'authenticated') return;
 
       const rt = localStorage.getItem('refreshToken');
       if (rt) {
         await refreshSession(rt);
+      } else {
+        // No session, no stored token — user is definitely logged out
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initializeAuth();
