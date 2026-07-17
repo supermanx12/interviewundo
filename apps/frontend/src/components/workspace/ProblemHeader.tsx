@@ -104,18 +104,22 @@ const getDifficultyDetails = (difficulty: string) => {
 export function ProblemHeader({ problem }: ProblemHeaderProps) {
   const { success: showSuccess, error: showError } = useToast();
   const { apiFetch } = useAuth();
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(!!problem.isLikedByUser);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [activeSolvers, setActiveSolvers] = useState<number | null>(null);
+  const [likesCountState, setLikesCountState] = useState(problem.likesCount);
 
   useEffect(() => {
     setMounted(true);
-    const liked = JSON.parse(localStorage.getItem('liked_problems') || '{}');
     const bookmarked = JSON.parse(localStorage.getItem('bookmarked_problems') || '{}');
-    setIsLiked(!!liked[problem.slug]);
     setIsBookmarked(!!bookmarked[problem.slug]);
   }, [problem.slug]);
+
+  useEffect(() => {
+    setIsLiked(!!problem.isLikedByUser);
+    setLikesCountState(problem.likesCount);
+  }, [problem.isLikedByUser, problem.likesCount]);
 
   useEffect(() => {
     const fetchActive = async () => {
@@ -132,17 +136,18 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
     return () => clearInterval(interval);
   }, [problem.slug, apiFetch]);
 
-  const toggleLike = () => {
-    const liked = JSON.parse(localStorage.getItem('liked_problems') || '{}');
-    const newState = !isLiked;
-    if (newState) {
-      liked[problem.slug] = true;
-    } else {
-      delete liked[problem.slug];
+  const toggleLike = async () => {
+    try {
+      const data = await apiFetch<{ liked: boolean; likesCount: number }>(
+        `/api/problems/${problem.slug}/like`,
+        { method: 'POST' },
+      );
+      setIsLiked(data.liked);
+      setLikesCountState(data.likesCount);
+      showSuccess(data.liked ? 'Added to liked challenges' : 'Removed from liked challenges');
+    } catch (e: any) {
+      showError(e.message || 'Failed to toggle like');
     }
-    localStorage.setItem('liked_problems', JSON.stringify(liked));
-    setIsLiked(newState);
-    showSuccess(newState ? 'Added to liked challenges' : 'Removed from liked challenges');
   };
 
   const toggleBookmark = () => {
@@ -169,7 +174,7 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
 
   // Smart fallbacks to make statistics look fully realistic if database defaults (0) are present
   const rawViews = problem.viewsCount || problem.attemptCount * 5 + 17;
-  const rawLikes = problem.likesCount || Math.max(2, Math.floor(problem.solvedCount * 0.12 + 1));
+  const rawLikes = likesCountState || Math.max(2, Math.floor(problem.solvedCount * 0.12 + 1));
   const attemptCount = problem.attemptCount;
   const solvedCount = problem.solvedCount;
   const estimatedTime = `${problem.estimatedMinutes || 15} mins`;

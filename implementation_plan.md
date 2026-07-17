@@ -334,7 +334,7 @@ This plan transforms problem pages and submission evaluation into a high-engagem
 
 ### Tasks
 
-- [ ] **4.1 — Add `ProblemLike` Join Table to Prisma Schema**
+- [x] **4.1 — Add `ProblemLike` Join Table to Prisma Schema**
 
   File: [`schema.prisma`](file:///d:/interviewUndo/apps/backend-api/src/infrastructure/database/prisma/schema.prisma)
 
@@ -372,13 +372,13 @@ This plan transforms problem pages and submission evaluation into a high-engagem
   }
   ```
 
-- [ ] **4.2 — Run Migration**
+- [x] **4.2 — Run Migration**
 
   ```bash
   npx prisma migrate dev --name add_problem_like_table
   ```
 
-- [ ] **4.3 — Add `toggleLike` Use Case**
+- [x] **4.3 — Add `toggleLike` Use Case**
 
   New file: `apps/backend-api/src/application/use-cases/problem/ToggleProblemLike.ts`
 
@@ -390,16 +390,16 @@ This plan transforms problem pages and submission evaluation into a high-engagem
 
   This must be an atomic DB transaction to avoid race conditions on `likesCount`.
 
-- [ ] **4.4 — Add `POST /api/problems/:slug/like` Route**
+- [x] **4.4 — Add `POST /api/problems/:slug/like` Route**
 
   Wire the new use case to the problems router. Requires authenticated user (JWT middleware already in place).
 
-- [ ] **4.5 — Update `ProblemHeader.tsx` to Use API Instead of localStorage**
+- [x] **4.5 — Update `ProblemHeader.tsx` to Use API Instead of localStorage**
 
   Replace the localStorage `toggleLike` implementation with an API call.
   Read initial like state from the API response (add `isLikedByUser?: boolean` to the problem response when user is authenticated).
 
-- [ ] **4.6 — Verify Phase 4**
+- [x] **4.6 — Verify Phase 4**
   - Like a problem, refresh the page — confirm like state persists
   - Unlike the same problem, refresh — confirm it's gone
   - Log in from a different device/browser — confirm like state syncs

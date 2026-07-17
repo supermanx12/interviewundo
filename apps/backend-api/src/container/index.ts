@@ -43,6 +43,7 @@ import { GetAdminProblems } from '../application/use-cases/admin/GetAdminProblem
 import { CreateProblem } from '../application/use-cases/problem/CreateProblem';
 import { UpdateProblem } from '../application/use-cases/problem/UpdateProblem';
 import { DeleteProblem } from '../application/use-cases/problem/DeleteProblem';
+import { ToggleProblemLike } from '../application/use-cases/problem/ToggleProblemLike';
 import { CreateTestCase } from '../application/use-cases/testcase/CreateTestCase';
 import { UpdateTestCase } from '../application/use-cases/testcase/UpdateTestCase';
 import { DeleteTestCase } from '../application/use-cases/testcase/DeleteTestCase';
@@ -88,6 +89,7 @@ const getHintForProblem = new GetHintForProblem(
   hintUsageRepository,
   hintService,
 );
+const toggleProblemLike = new ToggleProblemLike();
 const submitSolution = new SubmitSolution(
   submissionRepository,
   problemRepository,
@@ -126,6 +128,7 @@ const problemController = new ProblemController(
   getProblemBySlug,
   getDailyChallenge,
   getHintForProblem,
+  toggleProblemLike,
 );
 const submissionController = new SubmissionController(
   submitSolution,

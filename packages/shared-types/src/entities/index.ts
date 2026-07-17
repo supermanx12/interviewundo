@@ -42,6 +42,7 @@ export interface Problem {
   updatedAt: Date;
   testCases?: TestCase[];
   activeSolversCount?: number;
+  isLikedByUser?: boolean;
 }
 
 // ============================================================

@@ -7,7 +7,11 @@ import { AuthenticationError } from '../../domain/errors';
 // Verifies JWT token and attaches user information to Request
 // ============================================================
 
-export async function authenticate(req: Request, _res: Response, next: NextFunction): Promise<void> {
+export async function authenticate(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -33,5 +37,37 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
     next();
   } catch (error) {
     next(error);
+  }
+}
+
+export async function optionalAuthenticate(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next();
+    }
+
+    const token = authHeader.substring(7);
+
+    const { services } = container as any;
+    if (!services || !services.authTokenService) {
+      throw new Error('AuthTokenService is not registered in the dependency injection container');
+    }
+
+    const payload = await services.authTokenService.verifyAccessToken(token);
+
+    req.user = {
+      id: payload.userId,
+      role: payload.role,
+    };
+
+    next();
+  } catch (error) {
+    // Suppress error to allow unauthenticated request to proceed
+    next();
   }
 }

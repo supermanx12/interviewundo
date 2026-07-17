@@ -133,4 +133,49 @@ describe('Problem Endpoints Integration', () => {
       expect(res.body.success).toBe(true);
     }
   });
+
+  it('should protect the like endpoint behind authentication', async () => {
+    const res = await request(app).post(`/api/problems/${problemSlug}/like`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('should successfully toggle like for authenticated user', async () => {
+    const likeRes = await request(app)
+      .post(`/api/problems/${problemSlug}/like`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(likeRes.status).toBe(200);
+    expect(likeRes.body.success).toBe(true);
+    expect(likeRes.body.data.liked).toBe(true);
+    expect(likeRes.body.data.likesCount).toBe(1);
+
+    const getRes = await request(app)
+      .get(`/api/problems/${problemSlug}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(getRes.status).toBe(200);
+    expect(getRes.body.success).toBe(true);
+    expect(getRes.body.data.isLikedByUser).toBe(true);
+    expect(getRes.body.data.likesCount).toBe(1);
+
+    const unlikeRes = await request(app)
+      .post(`/api/problems/${problemSlug}/like`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(unlikeRes.status).toBe(200);
+    expect(unlikeRes.body.success).toBe(true);
+    expect(unlikeRes.body.data.liked).toBe(false);
+    expect(unlikeRes.body.data.likesCount).toBe(0);
+
+    const getRes2 = await request(app)
+      .get(`/api/problems/${problemSlug}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(getRes2.status).toBe(200);
+    expect(getRes2.body.success).toBe(true);
+    expect(getRes2.body.data.isLikedByUser).toBe(false);
+    expect(getRes2.body.data.likesCount).toBe(0);
+  }, 30000);
 });
