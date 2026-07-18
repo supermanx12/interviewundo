@@ -232,9 +232,9 @@ export function ProductShowcase() {
         {/* Top bar */}
         <div className="h-12 border-b border-[#525252]/30 flex items-center px-4 gap-4 bg-[#131313]">
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#525252]/50" />
-            <div className="w-3 h-3 rounded-full bg-[#525252]/50" />
-            <div className="w-3 h-3 rounded-full bg-[#525252]/50" />
+            <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+            <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+            <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
           </div>
           <div className="flex-1 flex justify-center">
             <AnimatePresence mode="wait">
