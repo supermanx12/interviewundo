@@ -228,7 +228,7 @@ export function ProductShowcase() {
       className="w-full max-w-[1200px] mx-auto px-6 relative mt-8 mb-24 z-10"
     >
       {/* Product Mockup Container */}
-      <div className="relative rounded-[16px] bg-[#191919] border border-white/5 overflow-hidden shadow-[0_0_44px_rgba(0,0,0,0.8)] aspect-[16/10] md:aspect-video flex flex-col">
+      <div className="relative rounded-[16px] bg-[#191919] border border-white/5 overflow-hidden shadow-[0_0_44px_rgba(0,0,0,0.8)] h-[500px] sm:h-[580px] md:h-[640px] lg:h-auto lg:aspect-video flex flex-col">
         {/* Top bar */}
         <div className="h-12 border-b border-[#525252]/30 flex items-center px-4 gap-4 bg-[#131313]">
           <div className="flex gap-1.5">
