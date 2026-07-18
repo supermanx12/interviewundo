@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Beams from '@/components/ui/Beams';
+import Beams from '@/components/ui/ClientBeams';
 import { Component as TrustedDevelopersBadge } from '@/components/ui/avatar-demo';
 import { TechStackGroup } from '@/components/ui/avatar-group-demo';
 
