@@ -1,0 +1,75 @@
+# ============================================================
+# VPS Production Docker Compose — Template
+# ~/redis-prod/docker-compose.yml
+#
+# IMPORTANT: Replace ALL <PLACEHOLDER> values before using.
+# Generate a strong password: openssl rand -base64 32
+#
+# Services:
+#   - PostgreSQL 16  (interviewprep-postgres)
+#   - Redis 7        (redis_app)
+#   - MongoDB 7      (interviewprep-mongo)
+# ============================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------
+  # PostgreSQL — Primary application database
+  # Bound to localhost only — not exposed to the internet
+  # ----------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: interviewprep-postgres
+    restart: always
+    ports:
+      - "127.0.0.1:5432:5432"   # localhost only — not internet-exposed
+    environment:
+      POSTGRES_DB: interviewprep
+      POSTGRES_USER: interviewprep_user
+      POSTGRES_PASSWORD: "<DB_PASSWORD>"  # Replace: openssl rand -base64 32
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U interviewprep_user -d interviewprep"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------
+  # Redis — Job queue & pub/sub
+  # Used by backend-api (BullMQ) and judge-worker
+  # Close port 6379 from public internet after Render is retired
+  # ----------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: redis_app
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"  # Change to 127.0.0.1 once Render is fully retired
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server
+      --requirepass "<REDIS_PASSWORD>"
+      --maxmemory 1gb
+      --maxmemory-policy noeviction
+      --appendonly yes
+      --appendfsync everysec
+
+  # ----------------------------------------------------------
+  # MongoDB — Used by code execution sandboxes (MongoDB runner)
+  # ----------------------------------------------------------
+  mongo:
+    image: mongo:7
+    container_name: interviewprep-mongo
+    restart: always
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongo_data:
