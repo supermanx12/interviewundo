@@ -8,6 +8,7 @@ import {
   ConflictError,
 } from '../../domain/errors';
 import { logger } from '../../config/logger';
+import { Sentry } from '../../config/sentry';
 
 // ============================================================
 // Global Error Handler
@@ -44,6 +45,9 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     });
     return;
   }
+
+  // Send unhandled server error to Sentry
+  Sentry.captureException(err);
 
   // Unexpected errors — log full stack trace
   logger.error(

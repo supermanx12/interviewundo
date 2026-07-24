@@ -59,15 +59,19 @@ async function gracefulShutdown(signal: string) {
   }, 10000);
 }
 
+import { Sentry } from './config/sentry';
+
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle unhandled rejections
 process.on('unhandledRejection', (reason) => {
+  Sentry.captureException(reason);
   logger.error({ reason }, 'Unhandled Rejection');
 });
 
 process.on('uncaughtException', (error) => {
+  Sentry.captureException(error);
   logger.fatal({ error }, 'Uncaught Exception');
   process.exit(1);
 });
