@@ -1,5 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { DomainError, NotFoundError, ValidationError, AuthenticationError, AuthorizationError, ConflictError } from '../../domain/errors';
+import {
+  DomainError,
+  NotFoundError,
+  ValidationError,
+  AuthenticationError,
+  AuthorizationError,
+  ConflictError,
+} from '../../domain/errors';
 import { logger } from '../../config/logger';
 
 // ============================================================
@@ -21,7 +28,10 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
   if (err instanceof DomainError) {
     const status = errorStatusMap.get(err.constructor.name) ?? 500;
 
-    logger.warn({ err: { code: err.code, message: err.message }, requestId, path: req.path }, 'Domain error');
+    logger.warn(
+      { err: { code: err.code, message: err.message }, requestId, path: req.path },
+      'Domain error',
+    );
 
     res.status(status).json({
       success: false,
@@ -35,14 +45,18 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     return;
   }
 
-  // Unexpected errors — don't leak internal details
-  logger.error({ err, requestId, path: req.path }, 'Unhandled error');
+  // Unexpected errors — log full stack trace
+  logger.error(
+    { err, message: err.message, stack: err.stack, requestId, path: req.path },
+    'Unhandled error',
+  );
 
   res.status(500).json({
     success: false,
     error: {
       code: 'INTERNAL_ERROR',
       message: 'An unexpected error occurred',
+      ...(process.env.NODE_ENV !== 'production' ? { detail: err.message, stack: err.stack } : {}),
     },
     requestId,
   });
