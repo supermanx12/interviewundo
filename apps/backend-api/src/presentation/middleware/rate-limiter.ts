@@ -4,6 +4,13 @@ import rateLimit from 'express-rate-limit';
 export const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: process.env.NODE_ENV === 'development' ? 10000 : 100, // Limit each IP to 10000 requests in dev, 100 in prod
+  skip: (req) =>
+    req.path === '/health' ||
+    req.path === '/ping' ||
+    req.path === '/keepalive' ||
+    req.path === '/api/health' ||
+    req.path === '/api/ping' ||
+    req.path === '/api/keepalive',
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => {
